@@ -1,6 +1,8 @@
 <!--  <li class=" nav-item-desktop"><button id="language-toggle" type="button" class="lang-toggle-btn" aria-label="Language Toggle">VI</button></li>-->
 <!DOCTYPE html>
 <html lang="vi">
+<link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/b/b5/ROBLOX_Studio_icon.png" type="image/png" />
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -635,7 +637,7 @@
             'games.title': 'Dự Án Roblox Của Tôi',
             'games.instructions': '<i class="fas fa-info-circle"></i> Click vào game để chơi thử ngay! Dữ liệu được cập nhật tự động từ Roblox.',
             'games.playing': 'Đang chơi',
-            'games.visits': 'Lượt ghé',
+            'games.visits': 'Lượt Chơi',
             'games.empty': 'Chưa có game nào. Vui lòng thêm game vào data/projects.json.',
             'games.loading': 'Đang tải thông tin game...',
             'games.fail': 'Không thể tải thông tin game. Vui lòng kiểm tra lại data/projects.json.',
@@ -1332,13 +1334,28 @@
                 ? (gameConfig.name.vi || gameConfig.name.en)
                 : gameConfig.name;
 
-           const thumbnailUrl = `https://thumbnails.roblox.com/v1/assets?assetIds=${gameId}&size=150x150&format=Png&isCircular=false&thumbnailType=AssetThumbnail`
+           const thumbnailUrl = `https://thumbnails.roproxy.com/v1/assets?assetIds=${gameId}&size=150x150&format=Png&isCircular=false&thumbnailType=AssetThumbnail`
 
            const thumbRes = await fetch(thumbnailUrl);
            const thumbData = await thumbRes.json();
-           const realThumb = thumbData.data?.[0]?.imageUrl || thumbnailUrl;
+  
+           const realThumb = thumbData.data?.[0].imageUrl;
+
+           const placeData = `https://apis.roproxy.com/universes/v1/places/${gameId}/universe`;
+           const placeRes = await fetch(placeData);
+           const placeJson = await placeRes.json();
+           const universeId = placeJson.universeId || gameId;
+           
+           const universeDataUrl = `https://games.roproxy.com/v1/games?universeIds=${universeId}`;
+           const universeRes = await fetch(universeDataUrl);
+           const universeJson = await universeRes.json();
+           const universeName = universeJson.name || fallbackName;
+
+           const playing = universeJson.data?.[0]?.playing;
+        const visits = universeJson.data?.[0]?.visits
+           console.log(playing)
             try {
-                const response = await fetch(`https://games.roblox.com/v1/games?universeIds=${gameId}`);
+                const response = await fetch(`https://games.roproxy.com/v1/games?universeIds=${gameId}`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.data && data.data.length > 0) {
@@ -1347,8 +1364,8 @@
                             id: gameId,
                             name: game.name || fallbackName,
                             thumbnail: realThumb,
-                            playing: game.playing || 0,
-                            visits: game.visiting || game.visits || 0,
+                            playing: playing || 0,
+                            visits: visits|| 0,
                             url: `https://www.roblox.com/games/${gameId}/`
                         };
                     }
@@ -1360,9 +1377,9 @@
             return {
                 id: gameId,
                 name: fallbackName,
-                thumbnail: thumbnailUrl,
-                playing: 0,
-                visits: 0,
+                thumbnail: realThumb,
+                playing: playing || 0,
+                visits: visits || 0,
                 url: `https://www.roblox.com/games/${gameId}/`
             };
         } catch (error) {
