@@ -1,0 +1,30 @@
+[
+  {
+    "name": "GÀ CÔNG NGHIỆP TV",
+    "nameEn": "GÀ CÔNG NGHIỆP TV",
+    "role": {
+      "vi": "Youtuber",
+      "en": "Youtuber"
+    },
+    "icon": "fas fa-user"
+  },
+  {
+    "name": "Morldev",
+    "nameEn": "Morldev",
+    "role": {
+      "vi": "Dev nổi tiếng 100K+ followers",
+      "en": "Dev with 100K+ followers"
+    },
+    "icon": "fas fa-user"
+  },
+    {
+    "name": "Nowell",
+    "nameEn": "Nowell",
+    "role": {
+      "vi": "Dev nổi tiếng ở Philipines",
+      "en": "Famous Dev in the Philippines"
+    },
+    "icon": "fas fa-user"
+  }
+]
+

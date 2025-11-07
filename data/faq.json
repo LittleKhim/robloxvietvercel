@@ -1,0 +1,135 @@
+[
+  {
+    "question": {
+      "vi": "Giá khóa học Lua là bao nhiêu?",
+      "en": "How much do the Lua courses cost?"
+    },
+    "answer": {
+      "vi": "Chúng tôi có nhiều gói khóa học: Người Mới (3.000.000₫ - 7 Buổi), Nâng Cao (5.000.000₫ - 10 Buổi), Chuyên Sâu (7.000.000₫ - 15 Buổi). Hoặc bạn có thể học theo giờ: Người Mới (250.000₫/giờ), Nâng Cao (350.000₫/giờ), Chuyên Sâu (450.000₫/giờ).",
+      "en": "We offer multiple packages: Beginner (3,000,000₫ – 7 sessions), Advanced (5,000,000₫ – 10 sessions), Professional (7,000,000₫ – 15 sessions). You can also book hourly lessons: Beginner (250,000₫/hour), Advanced (350,000₫/hour), Professional (450,000₫/hour)."
+    },
+    "tags": ["price", "giá", "cost", "phí", "course"]
+  },
+  {
+    "question": {
+      "vi": "Làm sao để kiếm tiền từ lập trình Lua?",
+      "en": "How can I make money with Lua programming?"
+    },
+    "answer": {
+      "vi": "Có nhiều cách để kiếm tiền từ Lua: 1) Làm game trên Roblox và kiếm tiền từ gamepass, developer products, 2) Nhận các job freelance lập trình Lua, 3) Bán scripts và tools Lua, 4) Làm việc cho các studio game. Trong khóa học, chúng tôi sẽ hướng dẫn bạn các cách thực tế để bắt đầu kiếm tiền.",
+      "en": "There are several ways to monetize Lua: 1) Build Roblox games and earn from gamepasses and developer products, 2) Take on freelance Lua scripting jobs, 3) Sell Lua scripts and tools, 4) Work with game studios. Our courses show practical steps to start earning."
+    },
+    "tags": ["money", "earn", "lua", "kiếm tiền", "freelance"]
+  },
+  {
+    "question": {
+      "vi": "Tôi chưa biết gì về lập trình có thể học Lua không?",
+      "en": "Can I learn Lua if I have no programming experience?"
+    },
+    "answer": {
+      "vi": "Hoàn toàn có thể! Khóa học Người Mới được thiết kế dành cho người chưa có kinh nghiệm lập trình. Chúng tôi sẽ hướng dẫn bạn từ những kiến thức cơ bản nhất, từng bước một cách chi tiết và dễ hiểu.",
+      "en": "Absolutely! The Beginner package is tailored for newcomers. We teach from the fundamentals with clear, step-by-step guidance."
+    },
+    "tags": ["beginner", "new", "người mới", "start"]
+  },
+  {
+    "question": {
+      "vi": "Khóa học kéo dài bao lâu?",
+      "en": "How long does each course last?"
+    },
+    "answer": {
+      "vi": "Tùy thuộc vào gói bạn chọn: Người Mới (7 buổi), Nâng Cao (10 buổi), Chuyên Sâu (15 buổi). Mỗi buổi học thường kéo dài 1-2 giờ. Bạn có thể linh hoạt sắp xếp thời gian học với giáo viên.",
+      "en": "It depends on the package: Beginner (7 sessions), Advanced (10 sessions), Professional (15 sessions). Each lesson lasts 1–2 hours and can be scheduled flexibly."
+    },
+    "tags": ["duration", "time", "lịch", "length"]
+  },
+  {
+    "question": {
+      "vi": "Học Lua có khó không?",
+      "en": "Is Lua difficult to learn?"
+    },
+    "answer": {
+      "vi": "Lua là một ngôn ngữ lập trình tương đối dễ học, đặc biệt phù hợp cho người mới bắt đầu. Với phương pháp dạy 1-1 và chương trình học bài bản, chúng tôi đảm bảo bạn sẽ nắm vững kiến thức nhanh chóng.",
+      "en": "Lua is relatively easy to learn, especially for beginners. Combined with 1-on-1 coaching and a structured curriculum, you'll grasp the concepts quickly."
+    },
+    "tags": ["difficulty", "hard", "easy", "khó"]
+  },
+  {
+    "question": {
+      "vi": "Tôi có thể học Lua để làm game Roblox không?",
+      "en": "Can I learn Lua to build Roblox games?"
+    },
+    "answer": {
+      "vi": "Có! Lua là ngôn ngữ chính để phát triển game trên Roblox. Trong khóa học, bạn sẽ học cách sử dụng Lua để tạo các tính năng game, scripts, hệ thống game và nhiều hơn nữa.",
+      "en": "Yes! Lua is the primary language for Roblox development. You will learn to create game features, scripts, and systems tailored for Roblox."
+    },
+    "tags": ["roblox", "game", "development", "làm game"]
+  },
+  {
+    "question": {
+      "vi": "Có được hỗ trợ sau khi học xong không?",
+      "en": "Do I get support after finishing the course?"
+    },
+    "answer": {
+      "vi": "Có, chúng tôi cung cấp hỗ trợ sau khóa học. Bạn có thể liên hệ để được giải đáp thắc mắc, hỗ trợ debug code và tư vấn dự án. Khóa Chuyên Sâu còn có mentorship dài hạn.",
+      "en": "Yes, post-course support is included. Contact us for Q&A, code debugging, and project advice. The Professional package includes extended mentorship."
+    },
+    "tags": ["support", "help", "mentor", "hỗ trợ"]
+  },
+  {
+    "question": {
+      "vi": "Làm sao để đăng ký khóa học?",
+      "en": "How do I register for a course?"
+    },
+    "answer": {
+      "vi": "Bạn có thể đăng ký bằng cách: 1) Nhấn nút \"Đăng Ký\" trên website, 2) Chọn phương thức đăng ký (Facebook hoặc Gmail), 3) Điền thông tin và chọn khóa học, 4) Chúng tôi sẽ liên hệ trong 24 giờ.",
+      "en": "Register by: 1) Clicking the \"Register\" button, 2) Choosing Facebook or Gmail, 3) Filling in your details and selecting a course, 4) Waiting for our confirmation within 24 hours."
+    },
+    "tags": ["register", "sign up", "đăng ký", "process"]
+  },
+  {
+    "question": {
+      "vi": "Có mã giảm giá không?",
+      "en": "Is there a discount code?"
+    },
+    "answer": {
+      "vi": "Có! Sử dụng mã \"HocVienLanDau\" để được giảm 10% cho khóa học đầu tiên. Áp dụng cho mọi gói khóa học.",
+      "en": "Yes! Use the code \"HocVienLanDau\" to get 10% off your first course. Applicable to all packages."
+    },
+    "tags": ["discount", "coupon", "giảm giá"]
+  },
+  {
+    "question": {
+      "vi": "Tôi có thể học theo giờ thay vì khóa học không?",
+      "en": "Can I book hourly lessons instead of a full course?"
+    },
+    "answer": {
+      "vi": "Có, bạn có thể học theo giờ để linh hoạt hơn. Giá: Người Mới (250.000₫/giờ), Nâng Cao (350.000₫/giờ), Chuyên Sâu (450.000₫/giờ).",
+      "en": "Yes, hourly coaching is available for flexible learning. Rates: Beginner (250,000₫/hour), Advanced (350,000₫/hour), Professional (450,000₫/hour)."
+    },
+    "tags": ["hourly", "flexible", "giờ", "coaching"]
+  },
+  {
+    "question": {
+      "vi": "Lập trình Lua có thể kiếm được bao nhiêu tiền?",
+      "en": "How much can I earn with Lua programming?"
+    },
+    "answer": {
+      "vi": "Thu nhập phụ thuộc vào kinh nghiệm và loại dự án. Freelancer Lua có thể kiếm 500k-2tr VNĐ/giờ. Nhà phát triển Roblox thành công có thể kiếm hàng chục triệu VNĐ/tháng.",
+      "en": "Income depends on experience and project type. Lua freelancers can earn 500k-2m VND per hour. Successful Roblox developers often make tens of millions of VND each month."
+    },
+    "tags": ["income", "salary", "earnings", "lương"]
+  },
+  {
+    "question": {
+      "vi": "Khóa học có cung cấp tài liệu không?",
+      "en": "Do courses include learning materials?"
+    },
+    "answer": {
+      "vi": "Có, học viên nhận được slides, code mẫu, bài tập thực hành và tài nguyên tham khảo. Tài liệu được cập nhật thường xuyên.",
+      "en": "Yes, you receive slides, sample code, exercises, and reference resources. Materials are updated regularly."
+    },
+    "tags": ["materials", "tài liệu", "resources", "notes"]
+  }
+]
+
