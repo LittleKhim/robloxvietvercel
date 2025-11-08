@@ -20,41 +20,53 @@ export default async function handler(req, res) {
             
             const { sellerEmail, category, verified, pending, page = 1, limit = 12, search } = req.query;
             
-            let query = {};
+            // Build base query conditions
+            const conditions = [];
             
             // Filter by seller
             if (sellerEmail) {
-                query.sellerEmail = decodeURIComponent(sellerEmail);
+                conditions.push({ sellerEmail: decodeURIComponent(sellerEmail) });
             }
             
             // Filter by category
             if (category && category !== 'all') {
-                query.category = category;
+                conditions.push({ category: category });
             }
             
             // For regular users, only show verified items
             // For admins, can see all or filter by verified status
             if (pending === 'true') {
-                query.verified = false;
+                conditions.push({ verified: false });
             } else if (verified !== undefined) {
-                query.verified = verified === 'true';
+                conditions.push({ verified: verified === 'true' });
             } else {
                 // Default: only show verified items to non-admins
-                query.verified = true;
-            }
-            
-            // Search by name or description
-            if (search && search.trim()) {
-                query.$or = [
-                    { name: { $regex: search.trim(), $options: 'i' } },
-                    { description: { $regex: search.trim(), $options: 'i' } }
-                ];
+                conditions.push({ verified: true });
             }
             
             // Auto-delete items older than 72 hours (only for verified items in browse view)
             if (pending !== 'true' && verified !== 'false') {
                 const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
-                query.createdAt = { $gte: seventyTwoHoursAgo };
+                conditions.push({ createdAt: { $gte: seventyTwoHoursAgo } });
+            }
+            
+            // Search by name or description
+            if (search && search.trim()) {
+                const searchRegex = { $regex: search.trim(), $options: 'i' };
+                conditions.push({
+                    $or: [
+                        { name: searchRegex },
+                        { description: searchRegex }
+                    ]
+                });
+            }
+            
+            // Build final query
+            let query = {};
+            if (conditions.length === 1) {
+                query = conditions[0];
+            } else if (conditions.length > 1) {
+                query = { $and: conditions };
             }
             
             const pageNum = parseInt(page);

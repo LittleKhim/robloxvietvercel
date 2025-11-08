@@ -5556,7 +5556,7 @@
                     document.getElementById(`marketplace-${tabName}-tab`).classList.add('active');
                     
                     if (tabName === 'browse') {
-                        loadMarketplaceItems();
+                        loadMarketplaceItems(1, currentMarketplaceCategory, currentMarketplaceSearch);
                     } else if (tabName === 'my-items') {
                         loadMyMarketplaceItems();
                     }
