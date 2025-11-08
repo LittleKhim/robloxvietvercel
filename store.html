@@ -1598,30 +1598,46 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    const serverBalance = parseFloat(data.balance) || 0;
-                    console.log('✅ Balance from server:', serverBalance);
+                    const serverBalance = parseFloat(data.balance);
                     
-                    // Update local balance
-                    userBalance = serverBalance;
-                    localStorage.setItem('store_balance', userBalance.toString());
-                    
-                    // Ensure balance is saved to MongoDB (sync)
-                    await updateBalanceOnServer(userBalance).catch(e => {
-                        console.error('Error syncing balance to MongoDB:', e);
-                    });
-                    
-                    saveUserData();
-                    
-                    // Update UI
-                    const balanceEl = document.getElementById('user-balance');
-                    if (balanceEl) {
-                        balanceEl.textContent = formatCurrency(userBalance);
-                        console.log('Balance UI updated:', userBalance);
+                    // Only update if server returned a valid number (not null/undefined)
+                    if (!isNaN(serverBalance) && serverBalance !== null && serverBalance !== undefined) {
+                        console.log('✅ Balance from server:', serverBalance);
+                        
+                        // Only update if server balance is different from current
+                        const currentLocalBalance = parseFloat(localStorage.getItem('store_balance')) || 0;
+                        if (serverBalance !== currentLocalBalance) {
+                            userBalance = serverBalance;
+                            localStorage.setItem('store_balance', userBalance.toString());
+                            console.log('Balance updated from server:', userBalance);
+                        } else {
+                            userBalance = currentLocalBalance;
+                            console.log('Balance unchanged, using local:', userBalance);
+                        }
+                        
+                        // Only save to MongoDB if balance > 0 or if explicitly needed
+                        // Don't overwrite with 0 unless it's a real 0
+                        if (userBalance > 0) {
+                            await updateBalanceOnServer(userBalance).catch(e => {
+                                console.error('Error syncing balance to MongoDB:', e);
+                            });
+                        }
+                        
+                        saveUserData();
+                        
+                        // Update UI
+                        updateBalanceDisplay();
+                        
+                        return userBalance;
                     } else {
-                        console.warn('Balance element not found when updating');
+                        console.warn('Server returned invalid balance, using local storage');
+                        const savedBalance = localStorage.getItem('store_balance');
+                        if (savedBalance) {
+                            userBalance = parseFloat(savedBalance);
+                            updateBalanceDisplay();
+                            return userBalance;
+                        }
                     }
-                    
-                    return userBalance;
                 } else {
                     console.warn('Failed to fetch balance, status:', response.status);
                     const errorText = await response.text();
@@ -1656,7 +1672,14 @@
         async function updateBalanceOnServer(newBalance) {
             if (!currentUser || !currentUser.email) {
                 console.warn('updateBalanceOnServer: No current user');
-                return;
+                return false;
+            }
+            
+            // Don't save balance = 0 unless it's explicitly needed (to prevent overwriting)
+            // Only save 0 if user explicitly has 0 (not from errors)
+            if (newBalance === 0 || newBalance === null || newBalance === undefined || isNaN(newBalance)) {
+                console.log('Skipping balance save: balance is 0 or invalid (to prevent overwriting)');
+                return false;
             }
             
             try {
@@ -1675,10 +1698,13 @@
                     const data = await response.json();
                     console.log('✅ Balance updated successfully on server:', data);
                     // Update local balance to match server
-                    if (data.balance !== undefined) {
-                        userBalance = parseFloat(data.balance);
-                        localStorage.setItem('store_balance', userBalance.toString());
-                        updateBalanceDisplay();
+                    if (data.balance !== undefined && !isNaN(parseFloat(data.balance))) {
+                        const serverBalance = parseFloat(data.balance);
+                        if (serverBalance >= 0) {
+                            userBalance = serverBalance;
+                            localStorage.setItem('store_balance', userBalance.toString());
+                            updateBalanceDisplay();
+                        }
                     }
                     return true;
                 } else {
@@ -2173,16 +2199,32 @@
                 localStorage.setItem('store_user', JSON.stringify(currentUser));
                 localStorage.setItem('store_balance', userBalance.toString());
                 
-                // Always save balance to MongoDB using the balance API endpoint
-                updateBalanceOnServer(userBalance).catch(error => {
-                    console.error('Error saving balance to server:', error);
-                });
+                // Only save balance to MongoDB if balance > 0 (to prevent overwriting with 0)
+                if (userBalance > 0) {
+                    updateBalanceOnServer(userBalance).then((success) => {
+                        if (success) {
+                            console.log('✅ Balance saved to server:', userBalance);
+                        }
+                    }).catch(error => {
+                        console.error('❌ Error saving balance to server:', error);
+                        // Retry after 1 second if balance > 0
+                        if (userBalance > 0) {
+                            setTimeout(() => {
+                                updateBalanceOnServer(userBalance).catch(e => {
+                                    console.error('❌ Retry failed:', e);
+                                });
+                            }, 1000);
+                        }
+                    });
+                } else {
+                    console.log('Skipping balance save: balance is 0 (to prevent overwriting)');
+                }
                 
-                // Also save user info to MongoDB
+                // Also save user info to MongoDB (without balance if 0)
                 saveUserToDB({
                     email: currentUser.email,
                     name: currentUser.name,
-                    balance: userBalance
+                    balance: userBalance > 0 ? userBalance : undefined
                 });
             }
         }
@@ -2906,14 +2948,44 @@
                     
                     if (balanceResponse.ok) {
                         const balanceData = await balanceResponse.json();
-                        userBalance = parseFloat(balanceData.balance) || 0;
-                        console.log('✅ Balance loaded from server:', userBalance);
+                        const serverBalance = parseFloat(balanceData.balance);
                         
-                        // Save to localStorage
-                        localStorage.setItem('store_balance', userBalance.toString());
-                        
-                        // Ensure balance is saved to MongoDB (in case it wasn't saved before)
-                        await updateBalanceOnServer(userBalance);
+                        // Only use server balance if it's a valid number
+                        if (!isNaN(serverBalance) && serverBalance !== null && serverBalance !== undefined) {
+                            const savedBalance = parseFloat(localStorage.getItem('store_balance')) || 0;
+                            
+                            // Use server balance if it's higher, or if local is 0
+                            if (serverBalance > savedBalance || savedBalance === 0) {
+                                userBalance = serverBalance;
+                                console.log('✅ Balance loaded from server:', userBalance);
+                            } else {
+                                // Keep local balance if it's higher (might be more recent)
+                                userBalance = savedBalance;
+                                console.log('✅ Using local balance (higher than server):', userBalance);
+                                // Sync local balance to server if it's higher
+                                if (userBalance > 0) {
+                                    await updateBalanceOnServer(userBalance);
+                                }
+                            }
+                            
+                            // Save to localStorage
+                            localStorage.setItem('store_balance', userBalance.toString());
+                            
+                            // Only save to MongoDB if balance > 0 (don't overwrite with 0)
+                            if (userBalance > 0) {
+                                await updateBalanceOnServer(userBalance);
+                            }
+                        } else {
+                            // Server returned invalid balance, use local
+                            const savedBalance = localStorage.getItem('store_balance');
+                            userBalance = savedBalance ? parseFloat(savedBalance) : 0;
+                            console.log('Server balance invalid, using local:', userBalance);
+                            
+                            // Only sync if balance > 0
+                            if (userBalance > 0) {
+                                await updateBalanceOnServer(userBalance);
+                            }
+                        }
                     } else {
                         const errorText = await balanceResponse.text();
                         console.warn('Failed to fetch balance from server:', errorText);
@@ -2922,7 +2994,7 @@
                         userBalance = savedBalance ? parseFloat(savedBalance) : 0;
                         console.log('Balance loaded from localStorage:', userBalance);
                         
-                        // Save the localStorage balance to MongoDB to ensure it's synced
+                        // Only save to MongoDB if balance > 0 (don't overwrite with 0)
                         if (userBalance > 0) {
                             await updateBalanceOnServer(userBalance);
                         }
@@ -2934,7 +3006,7 @@
                     userBalance = savedBalance ? parseFloat(savedBalance) : 0;
                     console.log('Balance loaded from localStorage (error fallback):', userBalance);
                     
-                    // Save the localStorage balance to MongoDB to ensure it's synced
+                    // Only save to MongoDB if balance > 0 (don't overwrite with 0)
                     if (userBalance > 0) {
                         await updateBalanceOnServer(userBalance).catch(e => {
                             console.error('Error syncing balance to MongoDB:', e);
@@ -2956,7 +3028,7 @@
                     try {
                         const refreshedBalance = await getCurrentBalance();
                         console.log('Balance refreshed after delay:', refreshedBalance);
-                        // Ensure balance is saved to MongoDB
+                        // Only save if balance > 0 (don't overwrite with 0)
                         if (refreshedBalance > 0) {
                             await updateBalanceOnServer(refreshedBalance);
                         }
@@ -2965,12 +3037,14 @@
                     }
                 }, 500);
                 
-                // Additional sync after 2 seconds to ensure balance is saved
+                // Additional sync after 2 seconds to ensure balance is saved (only if > 0)
                 setTimeout(async () => {
                     try {
                         const finalBalance = await getCurrentBalance();
-                        await updateBalanceOnServer(finalBalance);
-                        console.log('Final balance sync completed:', finalBalance);
+                        if (finalBalance > 0) {
+                            await updateBalanceOnServer(finalBalance);
+                            console.log('Final balance sync completed:', finalBalance);
+                        }
                     } catch (error) {
                         console.error('Error in final balance sync:', error);
                     }

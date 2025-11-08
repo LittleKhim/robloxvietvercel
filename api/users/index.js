@@ -48,6 +48,13 @@ export default async function handler(req, res) {
                     return res.status(400).json({ error: 'Balance must be a number' });
                 }
                 
+                // Don't allow setting balance to 0 if user already has a balance (prevent overwriting)
+                const existingUser = await usersCollection.findOne({ email: decodedEmail });
+                if (existingUser && existingUser.balance > 0 && balance === 0) {
+                    console.log('Preventing balance reset to 0 for user with existing balance:', decodedEmail, 'Current:', existingUser.balance);
+                    return res.status(200).json({ success: true, balance: existingUser.balance, prevented: true });
+                }
+                
                 console.log('Updating balance for:', decodedEmail, 'to:', balance);
                 
                 const result = await usersCollection.updateOne(
