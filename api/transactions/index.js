@@ -8,7 +8,15 @@ export default async function handler(req, res) {
     const { id } = req.query;
     
     try {
-        await client.connect();
+        // Connect if not already connected (connection pooling handles reuse)
+        try {
+            await client.connect();
+        } catch (err) {
+            // Ignore error if already connected
+            if (err.message && !err.message.includes('already connected')) {
+                throw err;
+            }
+        }
         const db = client.db('store_db');
         const transactionsCollection = db.collection('transactions');
         const usersCollection = db.collection('users');
@@ -74,18 +82,20 @@ export default async function handler(req, res) {
             });
         }
         
-        // GET TRANSACTIONS - GET /api/transactions?userEmail=...
+        // GET TRANSACTIONS - GET /api/transactions?userEmail=... or GET /api/transactions (all for admin)
         if (req.method === 'GET') {
-            const { userEmail } = req.query;
+            const { userEmail, all } = req.query;
             
             let query = {};
             if (userEmail) {
                 query.userEmail = decodeURIComponent(userEmail);
             }
+            // If all=true, return all transactions (for admin)
             
             const transactions = await transactionsCollection
                 .find(query)
                 .sort({ createdAt: -1 })
+                .limit(all === 'true' ? 1000 : 100) // Limit to 1000 for admin, 100 for user
                 .toArray();
             
             return res.status(200).json({ transactions: transactions });
@@ -98,7 +108,6 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('Transactions API error:', error);
         res.status(500).json({ error: 'Failed to process request', details: error.message });
-    } finally {
-        await client.close();
     }
+    // Don't close client in serverless - connection pooling handles it automatically
 }

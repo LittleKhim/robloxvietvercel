@@ -3217,6 +3217,8 @@
         function closeAdminPanel() {
             document.getElementById('admin-modal').style.display = 'none';
             document.body.style.overflow = '';
+            // Stop auto-refresh when admin panel closes
+            stopAdminTransactionsAutoRefresh();
         }
         
         function loadAdminOrders() {
@@ -4767,7 +4769,14 @@
                     // Load data for specific tab
                     if (tabName === 'transactions') {
                         loadAdminTransactions();
-                    } else if (tabName === 'blacklist') {
+                        // Start auto-refresh when transactions tab is opened
+                        initAdminTransactionsAutoRefresh();
+                    } else {
+                        // Stop auto-refresh when switching to other tabs
+                        stopAdminTransactionsAutoRefresh();
+                    }
+                    
+                    if (tabName === 'blacklist') {
                         loadBlacklist();
                     } else if (tabName === 'coupons') {
                         loadAdminCoupons();
@@ -4920,25 +4929,74 @@
             }
         }
         
-        function loadAdminTransactions() {
+        // Admin transactions auto-refresh
+        let adminTransactionsRefreshInterval = null;
+        
+        function initAdminTransactionsAutoRefresh() {
+            // Clear existing interval
+            if (adminTransactionsRefreshInterval) {
+                clearInterval(adminTransactionsRefreshInterval);
+            }
+            
+            // Auto-refresh every 5 seconds when admin panel is open and transactions tab is active
+            adminTransactionsRefreshInterval = setInterval(() => {
+                const adminModal = document.getElementById('admin-modal');
+                const transactionsTab = document.getElementById('admin-transactions-tab');
+                if (adminModal && adminModal.style.display !== 'none' && 
+                    transactionsTab && transactionsTab.classList.contains('active')) {
+                    console.log('🔄 Auto-refreshing admin transactions...');
+                    loadAdminTransactions(true); // Force refresh from server
+                }
+            }, 5000); // 5 seconds
+        }
+        
+        function stopAdminTransactionsAutoRefresh() {
+            if (adminTransactionsRefreshInterval) {
+                clearInterval(adminTransactionsRefreshInterval);
+                adminTransactionsRefreshInterval = null;
+            }
+        }
+        
+        async function loadAdminTransactions(forceServer = false) {
             const transactionsList = document.getElementById('admin-transactions-list');
             if (!transactionsList) return;
             
-            // Get all transactions from all users
             let allTransactions = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('store_transactions_')) {
-                    const userTransactions = JSON.parse(localStorage.getItem(key) || '[]');
-                    const userEmail = key.replace('store_transactions_', '');
-                    userTransactions.forEach(txn => {
-                        allTransactions.push({...txn, userEmail});
-                    });
+            
+            // Try to load from server first (real-time data)
+            try {
+                const response = await fetch(`${API_BASE_URL}/transactions?all=true`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const serverTransactions = data.transactions || [];
+                    allTransactions = serverTransactions;
+                    console.log('✅ Loaded transactions from server:', allTransactions.length);
+                } else {
+                    throw new Error('Failed to load from server');
+                }
+            } catch (error) {
+                console.warn('Failed to load transactions from server, using localStorage:', error);
+                // Fallback to localStorage if server fails
+                if (!forceServer) {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith('store_transactions_')) {
+                            const userTransactions = JSON.parse(localStorage.getItem(key) || '[]');
+                            const userEmail = key.replace('store_transactions_', '');
+                            userTransactions.forEach(txn => {
+                                allTransactions.push({...txn, userEmail});
+                            });
+                        }
+                    }
                 }
             }
             
             // Sort by date (newest first)
-            allTransactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            allTransactions.sort((a, b) => {
+                const dateA = new Date(a.createdAt || 0);
+                const dateB = new Date(b.createdAt || 0);
+                return dateB - dateA;
+            });
             
             if (allTransactions.length === 0) {
                 transactionsList.innerHTML = '<p style="text-align: center; padding: 2rem; color: #999;">Chưa có giao dịch nào</p>';
@@ -4962,9 +5020,9 @@
                     <div class="admin-transaction-item">
                         <div class="admin-transaction-header">
                             <div>
-                                <strong>${transaction.description}</strong>
+                                <strong>${transaction.description || 'Giao dịch nạp tiền'}</strong>
                                 <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
-                                    ${transaction.userEmail}
+                                    ${transaction.userEmail || transaction.email || 'N/A'}
                                 </div>
                             </div>
                             <div style="text-align: right;">
@@ -4979,10 +5037,10 @@
                         </div>
                         ${transaction.status === 'pending' ? `
                             <div class="admin-transaction-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                                <button class="admin-btn-small admin-btn-success" onclick="adminCompleteTransaction('${transaction.id}', '${transaction.userEmail}')">
+                                <button class="admin-btn-small admin-btn-success" onclick="adminCompleteTransaction('${transaction.id}', '${transaction.userEmail || transaction.email || ''}')">
                                     <i class="fas fa-check"></i> Xác nhận
                                 </button>
-                                <button class="admin-btn-small admin-btn-danger" onclick="adminCancelTransaction('${transaction.id}', '${transaction.userEmail}')">
+                                <button class="admin-btn-small admin-btn-danger" onclick="adminCancelTransaction('${transaction.id}', '${transaction.userEmail || transaction.email || ''}')">
                                     <i class="fas fa-times"></i> Hủy
                                 </button>
                             </div>
@@ -5052,7 +5110,7 @@
                 
                 closeNotification();
                 showNotification('Thành công', 'Đã xác nhận giao dịch và cập nhật số dư!', 'success', { timeout: 2000 });
-                loadAdminTransactions();
+                loadAdminTransactions(true); // Force refresh from server
             } catch (error) {
                 console.error('Error completing transaction:', error);
                 showNotification('Lỗi', 'Không thể xác nhận giao dịch. Vui lòng thử lại!', 'error');
@@ -5110,7 +5168,7 @@
                 
                 closeNotification();
                 showNotification('Thành công', 'Đã hủy giao dịch!', 'success', { timeout: 2000 });
-                loadAdminTransactions();
+                loadAdminTransactions(true); // Force refresh from server
             } catch (error) {
                 console.error('Error cancelling transaction:', error);
                 showNotification('Lỗi', 'Không thể hủy giao dịch. Vui lòng thử lại!', 'error');
