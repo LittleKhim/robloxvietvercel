@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             const db = client.db('store_db');
             const marketplaceCollection = db.collection('marketplace');
             
-            const { sellerEmail, category, verified, pending } = req.query;
+            const { sellerEmail, category, verified, pending, page = 1, limit = 12 } = req.query;
             
             let query = {};
             
@@ -42,9 +42,29 @@ export default async function handler(req, res) {
                 query.verified = true;
             }
             
-            const items = await marketplaceCollection.find(query).sort({ createdAt: -1 }).toArray();
+            const pageNum = parseInt(page);
+            const limitNum = parseInt(limit);
+            const skip = (pageNum - 1) * limitNum;
             
-            res.status(200).json({ items });
+            // Get total count for pagination
+            const total = await marketplaceCollection.countDocuments(query);
+            
+            const items = await marketplaceCollection
+                .find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limitNum)
+                .toArray();
+            
+            res.status(200).json({ 
+                items,
+                pagination: {
+                    page: pageNum,
+                    limit: limitNum,
+                    total,
+                    totalPages: Math.ceil(total / limitNum)
+                }
+            });
         } catch (error) {
             console.error('Error getting marketplace items:', error);
             res.status(500).json({ error: 'Failed to get marketplace items' });
@@ -57,7 +77,7 @@ export default async function handler(req, res) {
             const db = client.db('store_db');
             const marketplaceCollection = db.collection('marketplace');
             
-            const { sellerEmail, name, description, image, price, quantity, category } = req.body;
+            const { sellerEmail, name, description, image, price, quantity, category, phone, facebookLink } = req.body;
             
             if (!sellerEmail || !name || !price || !quantity) {
                 return res.status(400).json({ error: 'Missing required fields' });
@@ -74,6 +94,8 @@ export default async function handler(req, res) {
                 price: parseFloat(price),
                 quantity: parseInt(quantity),
                 category: category || 'other', // Default category
+                phone: phone || '',
+                facebookLink: facebookLink || '',
                 sold: 0,
                 verified: verified,
                 verifiedAt: verified ? new Date() : null,

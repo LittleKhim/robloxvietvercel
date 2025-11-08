@@ -490,9 +490,9 @@
                         <div class="admin-add-money">
                             <h3>Tìm Kiếm Thông Tin User</h3>
                             <div class="input-group">
-                                <label>Email người dùng:</label>
+                                <label>Email hoặc Tên đăng nhập:</label>
                                 <div style="display: flex; gap: 0.5rem;">
-                                    <input type="email" id="user-lookup-email" placeholder="user@example.com" style="flex: 1;">
+                                    <input type="text" id="user-lookup-email" placeholder="user@example.com hoặc username" style="flex: 1;">
                                     <button class="admin-btn" onclick="adminLookupUser()">
                                         <i class="fas fa-search"></i> Tìm Kiếm
                                     </button>
@@ -500,6 +500,16 @@
                             </div>
                             <div id="user-lookup-result" style="margin-top: 1.5rem;">
                                 <!-- User info will be displayed here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Verify Products Tab -->
+                    <div class="admin-tab-content" id="admin-verify-products-tab">
+                        <div class="admin-add-money">
+                            <h3>Duyệt Sản Phẩm Đăng Bán</h3>
+                            <div id="pending-products-list" style="margin-top: 1rem;">
+                                <!-- Pending products will be loaded here -->
                             </div>
                         </div>
                     </div>
@@ -581,7 +591,7 @@
                 <div class="marketplace-modal-content">
                     <div class="marketplace-tabs">
                         <button class="marketplace-tab active" data-tab="browse">
-                            <i class="fas fa-store"></i> Duyệt Sản Phẩm
+                            <i class="fas fa-store"></i> Sản Phẩm
                         </button>
                         <button class="marketplace-tab" data-tab="sell">
                             <i class="fas fa-upload"></i> Đăng Bán
@@ -596,6 +606,9 @@
                         <div class="marketplace-items-grid" id="marketplace-items-grid">
                             <!-- Items will be loaded here -->
                         </div>
+                        <div class="pagination-container" id="marketplace-pagination" style="margin-top: 2rem; display: none;">
+                            <!-- Pagination will be rendered here -->
+                        </div>
                     </div>
                     
                     <!-- Sell Tab -->
@@ -603,24 +616,38 @@
                         <div class="marketplace-sell-form">
                             <div class="input-group">
                                 <label>Tên sản phẩm:</label>
-                                <input type="text" id="sell-item-name" placeholder="Nhập tên sản phẩm">
+                                <input type="text" id="sell-item-name" placeholder="Nhập tên sản phẩm" required>
                             </div>
                             <div class="input-group">
                                 <label>Mô tả:</label>
                                 <textarea id="sell-item-description" placeholder="Mô tả chi tiết sản phẩm" rows="3"></textarea>
                             </div>
                             <div class="input-group">
-                                <label>Hình ảnh (URL):</label>
-                                <input type="url" id="sell-item-image" placeholder="https://example.com/image.jpg">
-                                <small style="color: #666; margin-top: 0.25rem;">Hoặc upload ảnh và paste link vào đây</small>
+                                <label>Hình ảnh:</label>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <input type="file" id="sell-item-image-file" accept="image/*" style="padding: 0.5rem; border: 2px solid rgba(76, 175, 80, 0.2); border-radius: 0.5rem;">
+                                    <div style="text-align: center; color: #666; font-size: 0.9rem;">hoặc</div>
+                                    <input type="url" id="sell-item-image-url" placeholder="https://example.com/image.jpg">
+                                </div>
+                                <div id="sell-item-image-preview" style="margin-top: 0.5rem; display: none;">
+                                    <img id="sell-item-preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 0.5rem; border: 2px solid rgba(76, 175, 80, 0.2);">
+                                </div>
                             </div>
                             <div class="input-group">
                                 <label>Giá bán (₫):</label>
-                                <input type="number" id="sell-item-price" placeholder="100000" min="1000">
+                                <input type="number" id="sell-item-price" placeholder="100000" min="1000" required>
                             </div>
                             <div class="input-group">
                                 <label>Số lượng:</label>
-                                <input type="number" id="sell-item-quantity" placeholder="1" min="1" value="1">
+                                <input type="number" id="sell-item-quantity" placeholder="1" min="1" value="1" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Số điện thoại liên hệ:</label>
+                                <input type="tel" id="sell-item-phone" placeholder="0123456789">
+                            </div>
+                            <div class="input-group">
+                                <label>Link Facebook (tùy chọn):</label>
+                                <input type="url" id="sell-item-facebook" placeholder="https://facebook.com/yourprofile">
                             </div>
                             <button class="marketplace-sell-btn" onclick="submitMarketplaceItem()">
                                 <i class="fas fa-upload"></i> Đăng Bán
@@ -632,6 +659,9 @@
                     <div class="marketplace-tab-content" id="marketplace-my-items-tab">
                         <div class="marketplace-items-grid" id="my-items-grid">
                             <!-- User's items will be loaded here -->
+                        </div>
+                        <div class="pagination-container" id="my-items-pagination" style="margin-top: 2rem; display: none;">
+                            <!-- Pagination will be rendered here -->
                         </div>
                     </div>
                 </div>
@@ -3270,13 +3300,19 @@
             document.body.style.overflow = '';
         }
         
-        async function loadMarketplaceItems() {
+        let currentMarketplacePage = 1;
+        let marketplacePagination = null;
+        
+        async function loadMarketplaceItems(page = 1) {
             try {
-                const response = await fetch(`${API_BASE_URL}/marketplace`);
+                currentMarketplacePage = page;
+                const response = await fetch(`${API_BASE_URL}/marketplace?page=${page}&limit=12`);
                 if (response.ok) {
                     const data = await response.json();
                     const items = data.items || [];
+                    marketplacePagination = data.pagination;
                     renderMarketplaceItems(items);
+                    renderPagination('marketplace-pagination', marketplacePagination, loadMarketplaceItems);
                 }
             } catch (error) {
                 console.error('Error loading marketplace items:', error);
@@ -3300,6 +3336,8 @@
                     <div class="marketplace-item-info">
                         <h3>${item.name}</h3>
                         <p>${item.description || 'Không có mô tả'}</p>
+                        ${item.phone ? `<p style="font-size: 0.85rem; color: #666; margin: 0.25rem 0;"><i class="fas fa-phone"></i> ${item.phone}</p>` : ''}
+                        ${item.facebookLink ? `<p style="font-size: 0.85rem; color: #666; margin: 0.25rem 0;"><i class="fab fa-facebook"></i> <a href="${item.facebookLink}" target="_blank" style="color: #1877f2;">Liên hệ Facebook</a></p>` : ''}
                         <div class="marketplace-item-footer">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
@@ -3318,6 +3356,41 @@
             `).join('');
         }
         
+        // Handle image upload preview
+        document.addEventListener('DOMContentLoaded', () => {
+            const imageFileInput = document.getElementById('sell-item-image-file');
+            const imageUrlInput = document.getElementById('sell-item-image-url');
+            const previewDiv = document.getElementById('sell-item-image-preview');
+            const previewImg = document.getElementById('sell-item-preview-img');
+            
+            if (imageFileInput) {
+                imageFileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            previewImg.src = event.target.result;
+                            previewDiv.style.display = 'block';
+                            imageUrlInput.value = ''; // Clear URL input
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            
+            if (imageUrlInput) {
+                imageUrlInput.addEventListener('input', (e) => {
+                    if (e.target.value) {
+                        previewImg.src = e.target.value;
+                        previewDiv.style.display = 'block';
+                        if (imageFileInput) imageFileInput.value = ''; // Clear file input
+                    } else {
+                        previewDiv.style.display = 'none';
+                    }
+                });
+            }
+        });
+        
         async function submitMarketplaceItem() {
             if (!currentUser || !currentUser.email) {
                 showNotification('Lỗi', 'Vui lòng đăng nhập trước!', 'error');
@@ -3326,9 +3399,47 @@
             
             const name = document.getElementById('sell-item-name').value.trim();
             const description = document.getElementById('sell-item-description').value.trim();
-            const image = document.getElementById('sell-item-image').value.trim();
             const price = parseFloat(document.getElementById('sell-item-price').value);
             const quantity = parseInt(document.getElementById('sell-item-quantity').value);
+            const phone = document.getElementById('sell-item-phone').value.trim();
+            const facebookLink = document.getElementById('sell-item-facebook').value.trim();
+            
+            // Get image from file or URL
+            let image = '';
+            const imageFileInput = document.getElementById('sell-item-image-file');
+            const imageUrlInput = document.getElementById('sell-item-image-url');
+            
+            if (imageFileInput && imageFileInput.files && imageFileInput.files[0]) {
+                // Convert file to base64
+                const file = imageFileInput.files[0];
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    showNotification('Lỗi', 'Kích thước ảnh không được vượt quá 5MB!', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    image = event.target.result; // base64 data URL
+                    await submitItemWithImage(image);
+                };
+                reader.readAsDataURL(file);
+                return; // Will continue in callback
+            } else if (imageUrlInput && imageUrlInput.value.trim()) {
+                image = imageUrlInput.value.trim();
+            } else {
+                showNotification('Lỗi', 'Vui lòng chọn ảnh hoặc nhập URL ảnh!', 'error');
+                return;
+            }
+            
+            await submitItemWithImage(image);
+        }
+        
+        async function submitItemWithImage(image) {
+            const name = document.getElementById('sell-item-name').value.trim();
+            const description = document.getElementById('sell-item-description').value.trim();
+            const price = parseFloat(document.getElementById('sell-item-price').value);
+            const quantity = parseInt(document.getElementById('sell-item-quantity').value);
+            const phone = document.getElementById('sell-item-phone').value.trim();
+            const facebookLink = document.getElementById('sell-item-facebook').value.trim();
             
             if (!name || !price || price < 1000 || !quantity || quantity < 1) {
                 showNotification('Lỗi', 'Vui lòng điền đầy đủ thông tin hợp lệ!', 'error');
@@ -3343,24 +3454,32 @@
                         sellerEmail: currentUser.email,
                         name: name,
                         description: description,
-                        image: image || 'https://via.placeholder.com/200',
+                        image: image,
                         price: price,
-                        quantity: quantity
+                        quantity: quantity,
+                        phone: phone,
+                        facebookLink: facebookLink
                     })
                 });
                 
+                const data = await response.json();
+                
                 if (response.ok) {
-                    showNotification('Thành công', 'Đã đăng bán sản phẩm!', 'success');
+                    showNotification('Thành công', data.message || 'Đã đăng bán sản phẩm!', 'success');
                     // Clear form
                     document.getElementById('sell-item-name').value = '';
                     document.getElementById('sell-item-description').value = '';
-                    document.getElementById('sell-item-image').value = '';
+                    document.getElementById('sell-item-image-file').value = '';
+                    document.getElementById('sell-item-image-url').value = '';
                     document.getElementById('sell-item-price').value = '';
                     document.getElementById('sell-item-quantity').value = '1';
+                    document.getElementById('sell-item-phone').value = '';
+                    document.getElementById('sell-item-facebook').value = '';
+                    document.getElementById('sell-item-image-preview').style.display = 'none';
                     // Reload items
-                    loadMarketplaceItems();
+                    loadMarketplaceItems(1);
                 } else {
-                    throw new Error('Failed to submit item');
+                    throw new Error(data.error || 'Failed to submit item');
                 }
             } catch (error) {
                 console.error('Error submitting marketplace item:', error);
@@ -3378,22 +3497,190 @@
             showNotification('Thông báo', 'Tính năng mua sản phẩm đang được phát triển', 'info');
         }
         
-        async function loadMyMarketplaceItems() {
+        let currentMyItemsPage = 1;
+        let myItemsPagination = null;
+        
+        async function loadMyMarketplaceItems(page = 1) {
             if (!currentUser || !currentUser.email) return;
             
             try {
+                currentMyItemsPage = page;
                 const email = encodeURIComponent(currentUser.email);
-                const response = await fetch(`${API_BASE_URL}/marketplace?sellerEmail=${email}`);
+                const response = await fetch(`${API_BASE_URL}/marketplace?sellerEmail=${email}&page=${page}&limit=12`);
                 if (response.ok) {
                     const data = await response.json();
                     const items = data.items || [];
+                    myItemsPagination = data.pagination;
                     const grid = document.getElementById('my-items-grid');
                     if (grid) {
-                        renderMarketplaceItems(items, grid);
+                        if (items.length === 0) {
+                            grid.innerHTML = '<p style="text-align: center; padding: 2rem; color: #666;">Bạn chưa đăng sản phẩm nào</p>';
+                        } else {
+                            renderMarketplaceItems(items, grid);
+                        }
                     }
+                    renderPagination('my-items-pagination', myItemsPagination, loadMyMarketplaceItems);
                 }
             } catch (error) {
                 console.error('Error loading my marketplace items:', error);
+            }
+        }
+        
+        function renderPagination(containerId, pagination, loadFunction) {
+            const container = document.getElementById(containerId);
+            if (!container || !pagination || pagination.totalPages <= 1) {
+                if (container) container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'flex';
+            container.style.justifyContent = 'center';
+            container.style.gap = '0.5rem';
+            container.style.flexWrap = 'wrap';
+            
+            let html = '';
+            
+            // Previous button
+            html += `<button class="pagination-btn" ${pagination.page === 1 ? 'disabled' : ''} onclick="${loadFunction.name}(${pagination.page - 1})">
+                <i class="fas fa-chevron-left"></i>
+            </button>`;
+            
+            // Page numbers
+            const maxPages = 5;
+            let startPage = Math.max(1, pagination.page - Math.floor(maxPages / 2));
+            let endPage = Math.min(pagination.totalPages, startPage + maxPages - 1);
+            
+            if (endPage - startPage < maxPages - 1) {
+                startPage = Math.max(1, endPage - maxPages + 1);
+            }
+            
+            if (startPage > 1) {
+                html += `<button class="pagination-btn" onclick="${loadFunction.name}(1)">1</button>`;
+                if (startPage > 2) {
+                    html += `<span class="pagination-ellipsis">...</span>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="pagination-btn ${i === pagination.page ? 'active' : ''}" onclick="${loadFunction.name}(${i})">${i}</button>`;
+            }
+            
+            if (endPage < pagination.totalPages) {
+                if (endPage < pagination.totalPages - 1) {
+                    html += `<span class="pagination-ellipsis">...</span>`;
+                }
+                html += `<button class="pagination-btn" onclick="${loadFunction.name}(${pagination.totalPages})">${pagination.totalPages}</button>`;
+            }
+            
+            // Next button
+            html += `<button class="pagination-btn" ${pagination.page === pagination.totalPages ? 'disabled' : ''} onclick="${loadFunction.name}(${pagination.page + 1})">
+                <i class="fas fa-chevron-right"></i>
+            </button>`;
+            
+            container.innerHTML = html;
+        }
+        
+        // Admin: Load pending products
+        async function loadPendingProducts() {
+            if (!isAdmin()) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/marketplace?pending=true`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const items = data.items || [];
+                    const container = document.getElementById('pending-products-list');
+                    
+                    if (!container) return;
+                    
+                    if (items.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; padding: 2rem; color: #666;">Không có sản phẩm nào chờ duyệt</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = items.map(item => `
+                        <div class="admin-order-item" style="margin-bottom: 1rem;">
+                            <div style="display: flex; gap: 1rem;">
+                                <img src="${item.image || 'https://via.placeholder.com/200'}" alt="${item.name}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0 0 0.5rem 0;">${item.name}</h4>
+                                    <p style="margin: 0 0 0.5rem 0; color: #666;">${item.description || 'Không có mô tả'}</p>
+                                    <div style="display: flex; gap: 1rem; margin-bottom: 0.5rem;">
+                                        <span><strong>Giá:</strong> ${formatCurrency(item.price)}</span>
+                                        <span><strong>Số lượng:</strong> ${item.quantity}</span>
+                                    </div>
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <span><strong>Người bán:</strong> ${item.sellerEmail}</span>
+                                    </div>
+                                    ${item.phone ? `<div style="margin-bottom: 0.5rem;"><strong>Điện thoại:</strong> ${item.phone}</div>` : ''}
+                                    ${item.facebookLink ? `<div style="margin-bottom: 0.5rem;"><strong>Facebook:</strong> <a href="${item.facebookLink}" target="_blank">${item.facebookLink}</a></div>` : ''}
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                        <button class="admin-btn" style="background: #4caf50;" onclick="adminVerifyProduct('${item._id}')">
+                                            <i class="fas fa-check"></i> Duyệt
+                                        </button>
+                                        <button class="admin-btn" style="background: #f44336;" onclick="adminRejectProduct('${item._id}')">
+                                            <i class="fas fa-times"></i> Từ chối
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading pending products:', error);
+            }
+        }
+        
+        async function adminVerifyProduct(itemId) {
+            if (!isAdmin() || !currentUser) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/marketplace?id=${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'verify',
+                        adminEmail: currentUser.email
+                    })
+                });
+                
+                if (response.ok) {
+                    showNotification('Thành công', 'Đã duyệt sản phẩm!', 'success');
+                    loadPendingProducts();
+                } else {
+                    throw new Error('Failed to verify');
+                }
+            } catch (error) {
+                console.error('Error verifying product:', error);
+                showNotification('Lỗi', 'Không thể duyệt sản phẩm!', 'error');
+            }
+        }
+        
+        async function adminRejectProduct(itemId) {
+            if (!isAdmin() || !currentUser) return;
+            
+            if (!confirm('Bạn có chắc muốn từ chối sản phẩm này?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/marketplace?id=${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'reject',
+                        adminEmail: currentUser.email
+                    })
+                });
+                
+                if (response.ok) {
+                    showNotification('Thành công', 'Đã từ chối sản phẩm!', 'success');
+                    loadPendingProducts();
+                } else {
+                    throw new Error('Failed to reject');
+                }
+            } catch (error) {
+                console.error('Error rejecting product:', error);
+                showNotification('Lỗi', 'Không thể từ chối sản phẩm!', 'error');
             }
         }
         
@@ -3554,29 +3841,63 @@
         
         // Admin Panel Functions - New Tabs
         async function adminLookupUser() {
-            const email = document.getElementById('user-lookup-email').value.trim();
-            if (!email) {
-                showNotification('Lỗi', 'Vui lòng nhập email!', 'error');
+            const searchTerm = document.getElementById('user-lookup-email').value.trim();
+            if (!searchTerm) {
+                showNotification('Lỗi', 'Vui lòng nhập email hoặc tên đăng nhập!', 'error');
                 return;
             }
             
             try {
+                // Search user by email or name
+                const searchResponse = await fetch(`${API_BASE_URL}/users?search=${encodeURIComponent(searchTerm)}`);
+                const searchData = searchResponse.ok ? await searchResponse.json() : { users: [] };
+                
+                if (!searchData.users || searchData.users.length === 0) {
+                    document.getElementById('user-lookup-result').innerHTML = `
+                        <div class="admin-order-item">
+                            <p style="color: #f44336;">Không tìm thấy user nào!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Use first result
+                const user = searchData.users[0];
+                const userEmail = user.email;
+                
                 // Get user balance
-                const balanceResponse = await fetch(`${API_BASE_URL}/users?action=balance&email=${encodeURIComponent(email)}`);
+                const balanceResponse = await fetch(`${API_BASE_URL}/users?action=balance&email=${encodeURIComponent(userEmail)}`);
                 const balanceData = balanceResponse.ok ? await balanceResponse.json() : { balance: 0 };
                 
+                // Get full user info to check password
+                const fullUserResponse = await fetch(`${API_BASE_URL}/users?email=${encodeURIComponent(userEmail)}`);
+                const fullUser = fullUserResponse.ok ? await fullUserResponse.json() : null;
+                const hasPassword = fullUser && fullUser.password ? true : false;
+                
                 // Get transactions
-                const transResponse = await fetch(`${API_BASE_URL}/transactions?email=${encodeURIComponent(email)}`);
+                const transResponse = await fetch(`${API_BASE_URL}/transactions?userEmail=${encodeURIComponent(userEmail)}`);
                 const transData = transResponse.ok ? await transResponse.json() : { transactions: [] };
                 
                 // Get subscription
-                const subResponse = await fetch(`${API_BASE_URL}/subscriptions?email=${encodeURIComponent(email)}`);
+                const subResponse = await fetch(`${API_BASE_URL}/subscriptions?email=${encodeURIComponent(userEmail)}`);
                 const subData = subResponse.ok ? await subResponse.json() : { subscription: null };
                 
                 const resultDiv = document.getElementById('user-lookup-result');
                 resultDiv.innerHTML = `
                     <div class="admin-order-item">
-                        <h3 style="margin-bottom: 1rem;">Thông tin User: ${email}</h3>
+                        <h3 style="margin-bottom: 1rem;">Thông tin User</h3>
+                        <div class="confirm-detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${userEmail}</span>
+                        </div>
+                        <div class="confirm-detail-item">
+                            <span class="detail-label">Tên đăng nhập:</span>
+                            <span class="detail-value">${user.name || '<span style="color: #999;">Chưa có</span>'}</span>
+                        </div>
+                        <div class="confirm-detail-item">
+                            <span class="detail-label">Có mật khẩu:</span>
+                            <span class="detail-value">${hasPassword ? '<span style="color: #4caf50;">Có</span>' : '<span style="color: #f44336;">Chưa có</span>'}</span>
+                        </div>
                         <div class="confirm-detail-item">
                             <span class="detail-label">Số tiền:</span>
                             <span class="detail-value">${formatCurrency(balanceData.balance || 0)}</span>
@@ -3599,11 +3920,68 @@
                             <span class="detail-value">${subData.subscription.autoPayment ? 'Có' : 'Không'}</span>
                         </div>
                         ` : ''}
+                        
+                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e0e0e0;">
+                            <h4 style="margin-bottom: 1rem;">Quản Lý User</h4>
+                            <div class="input-group" style="margin-bottom: 0.75rem;">
+                                <label>Tên đăng nhập:</label>
+                                <input type="text" id="admin-update-name" placeholder="${user.name || 'Nhập tên đăng nhập'}" value="${user.name || ''}" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 0.5rem;">
+                            </div>
+                            <div class="input-group" style="margin-bottom: 0.75rem;">
+                                <label>Mật khẩu mới (để trống nếu không đổi):</label>
+                                <input type="password" id="admin-update-password" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 0.5rem;">
+                            </div>
+                            <button class="admin-btn" onclick="adminUpdateUser('${userEmail}')" style="width: 100%;">
+                                <i class="fas fa-save"></i> Cập Nhật User
+                            </button>
+                        </div>
                     </div>
                 `;
             } catch (error) {
                 console.error('Error looking up user:', error);
                 showNotification('Lỗi', 'Không thể tìm kiếm user. Vui lòng thử lại!', 'error');
+            }
+        }
+        
+        async function adminUpdateUser(email) {
+            const name = document.getElementById('admin-update-name').value.trim();
+            const password = document.getElementById('admin-update-password').value;
+            
+            if (!name && !password) {
+                showNotification('Lỗi', 'Vui lòng nhập tên đăng nhập hoặc mật khẩu!', 'error');
+                return;
+            }
+            
+            if (password && password.length < 6) {
+                showNotification('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users?email=${encodeURIComponent(email)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name || undefined,
+                        password: password || undefined
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showNotification('Thành công', 'Cập nhật user thành công!', 'success', { timeout: 2000 });
+                    // Reload user info
+                    setTimeout(() => {
+                        document.getElementById('user-lookup-email').value = email;
+                        adminLookupUser();
+                    }, 500);
+                } else {
+                    showNotification('Lỗi', data.error || 'Cập nhật user thất bại!', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showNotification('Lỗi', 'Không thể cập nhật user. Vui lòng thử lại!', 'error');
             }
         }
         
@@ -3801,6 +4179,8 @@
                         loadBlacklist();
                     } else if (tabName === 'coupons') {
                         loadAdminCoupons();
+                    } else if (tabName === 'verify-products') {
+                        loadPendingProducts();
                     }
                 });
             });
