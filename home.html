@@ -1,0 +1,1584 @@
+<!--  <li class=" nav-item-desktop"><button id="language-toggle" type="button" class="lang-toggle-btn" aria-label="Language Toggle">VI</button></li>-->
+<!DOCTYPE html>
+<html lang="vi">
+<link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/b/b5/ROBLOX_Studio_icon.png" type="image/png" />
+
+<head>
+
+    <meta name="og:type"content="website">
+    <meta name="og:title" content="Đào Tạo Lập Trình Lua - Khóa Học Lua Chuyên Nghiệp">
+    <meta name="og:description" content="Học lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm. Khóa học theo gói hoặc học theo giờ - Kèm 1-1 cá nhân hóa.">
+    <meta name="og:image" content="https://ibb.co/DgSfYG7K">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đào Tạo Lập Trình Lua - Khóa Học Lua Chuyên Nghiệp</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+</head>
+
+<body>
+    <nav id="main-nav" class="nav-visible">
+        <div class="nav-content nav-centered">
+            <ul class="nav-menu">
+                <li class="nav-item-desktop"><a href="#" id="home-link" data-i18n="nav.home">Home</a></li>
+                <li class="nav-item-desktop"><a href="#pricing" data-i18n="nav.pricing">Price</a></li>
+                <li class="nav-item-desktop"><a href="#courses" data-i18n="nav.courses">Courses</a></li>
+                <li class="nav-item-desktop"><a href="#" id="register-link" data-i18n="nav.register">Register</a></li>
+            
+                <li class="nav-item-portfolio"><a href="https://www.littlekhim.online/" target="_blank" class="portfolio-link"><i class="fas fa-briefcase"></i> <span data-i18n="nav.portfolio">Portfolio</span></a></li>
+             
+            </ul>
+                </div>
+        <div class="nav-right ">
+               
+               
+        </div>
+    </nav>
+    <main id="main-content">
+
+
+        <section class="hero">
+            <h1 data-i18n="hero.title">Đào Tạo Lập Trình Lua</h1>
+            <p class="subtitle" data-i18n="hero.subtitle">Học lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm</p>
+            <p class="mistitle" data-i18n="hero.tagline">Khóa học theo gói hoặc học theo giờ - Kèm 1-1 cá nhân hóa</p>
+            <div class="hero-buttons">
+                <a href="#pricing" class="hero-btn"><i class="fas fa-graduation-cap"></i> <span data-i18n="hero.ctaPricing">Xem Bảng Giá</span></a>
+                <a href="#" id="hero-register-link" class="hero-btn"><i class="fas fa-user-plus"></i> <span data-i18n="hero.ctaRegister">Đăng Ký Ngay</span></a>
+            </div>
+        </section>
+
+
+        <div class="stats-title" data-i18n="stats.title">Thống Kê Đào Tạo</div>
+        <section class="stats-grid">
+            <div class="stat-item">
+                <i class="fas fa-users"></i>
+                <div class="stat-value" data-target="0" data-suffix="+">0</div>
+                <div class="stat-label" data-i18n="stats.students">Học Viên Đã Đăng Ký</div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-star"></i>
+                <div class="stat-value" data-target="0" data-suffix="" data-decimal="true">0</div>
+                <div class="stat-label" data-i18n="stats.rating">Đánh Giá Trung Bình</div>
+            </div>
+        </section>
+
+        <div class="languages-title" data-i18n="languages.title">Ngôn Ngữ Lập Trình</div>
+        <section class="languages-grid">
+            <div class="lang-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/ROBLOX_Studio_icon.png" alt="Lua" class="lang-icon" />
+                <span data-i18n="languages.lua">Lua</span>
+            </div>
+        </section>
+
+        <div class="why-title" data-i18n="why.title">Tại Sao <span class="accent">Chọn Chúng Tôi?</span></div>
+        <section class="why-grid">
+            <div class="why-card">
+                <i class="fas fa-user-graduate"></i>
+                <div class="why-card-title" data-i18n="why.card1.title">Kèm 1-1 Cá Nhân Hóa</div>
+                <div class="why-card-desc" data-i18n="why.card1.desc">Học <span class="accent">trực tiếp 1-1</span> với giáo viên, được <span class="accent">hỗ trợ tận tình</span> và <span class="accent">theo dõi tiến độ</span> từng bước một cách chi tiết.</div>
+            </div>
+            <div class="why-card">
+                <i class="fas fa-book"></i>
+                <div class="why-card-title" data-i18n="why.card2.title">Chương Trình Học Bài Bản</div>
+                <div class="why-card-desc" data-i18n="why.card2.desc">Chương trình được <span class="accent">thiết kế chuyên nghiệp</span>, từ cơ bản đến nâng cao, phù hợp với <span class="accent">mọi trình độ</span> của học viên.</div>
+            </div>
+            <div class="why-card">
+                <i class="fas fa-code"></i>
+                <div class="why-card-title" data-i18n="why.card3.title">Thực Hành Thực Tế</div>
+                <div class="why-card-desc" data-i18n="why.card3.desc">Học đi đôi với <span class="accent">hành</span>, làm các <span class="accent">dự án thực tế</span> để nắm vững kiến thức và <span class="accent">kinh nghiệm</span> lập trình.</div>
+            </div>
+            <div class="why-card">
+                <i class="fas fa-clock"></i>
+                <div class="why-card-title" data-i18n="why.card4.title">Linh Hoạt Thời Gian</div>
+                <div class="why-card-desc" data-i18n="why.card4.desc">Có thể học <span class="accent">theo khóa học</span> hoặc <span class="accent">theo giờ</span>, linh hoạt phù hợp với <span class="accent">lịch trình</span> của bạn.</div>
+            </div>
+            <div class="why-card">
+                <i class="fas fa-graduation-cap"></i>
+                <div class="why-card-title" data-i18n="why.card5.title">Giáo Viên Kinh Nghiệm</div>
+                <div class="why-card-desc" data-i18n="why.card5.desc">Giáo viên có <span class="accent">4+ năm kinh nghiệm</span> lập trình Lua, <span class="accent">nhiệt tình</span> và <span class="accent">chuyên nghiệp</span>.</div>
+            </div>
+            <div class="why-card">
+                <i class="fas fa-headset"></i>
+                <div class="why-card-title" data-i18n="why.card6.title">Hỗ Trợ Sau Khóa Học</div>
+                <div class="why-card-desc" data-i18n="why.card6.desc">Được <span class="accent">hỗ trợ</span> và <span class="accent">giải đáp thắc mắc</span> ngay cả sau khi hoàn thành khóa học.</div>
+            </div>
+        </section>
+
+        <div class="pricing-title" id="pricing" data-i18n="pricing.title">Bảng Giá Khóa Học</div>
+        
+        <div class="pricing-section-title" data-i18n="pricing.packages">Khóa Học Theo Gói</div>
+        <section class="pricing-grid" id="courses">
+            <div class="pricing-card">
+                <div class="pricing-type standard" data-i18n="pricing.beginner.title">Lua Beginner</div>
+                <div class="pricing-price" data-vnd="3000000">3.000.000₫</div>
+                <div class="pricing-sessions" data-i18n="pricing.beginner.sessions">7 Buổi Học</div>
+                <div class="pricing-desc" data-i18n="pricing.beginner.desc">Dành cho người mới bắt đầu học Lua</div>
+                <ul class="pricing-features">
+                    <li data-i18n="pricing.beginner.feature1"><strong>Kiến thức cơ bản</strong> – Học từ đầu về Lua programming</li>
+                    <li data-i18n="pricing.beginner.feature2"><strong>7 buổi học 1-1</strong> – Kèm riêng với giáo viên</li>
+                    <li data-i18n="pricing.beginner.feature3"><strong>Tài liệu học tập</strong> – Đầy đủ tài liệu và bài tập</li>
+                    <li data-i18n="pricing.beginner.feature4"><strong>Thực hành dự án</strong> – Làm các dự án thực tế</li>
+                </ul>
+                <button class="pricing-btn" data-i18n="pricing.cta" onclick="document.getElementById('register-link').click()">Đăng Ký Ngay</button>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-type pro" data-i18n="pricing.advanced.title">Lua Advanced</div>
+                <div class="pricing-price" data-vnd="5000000">5.000.000₫</div>
+                <div class="pricing-sessions" data-i18n="pricing.advanced.sessions">10 Buổi Học</div>
+                <div class="pricing-desc" data-i18n="pricing.advanced.desc">Nâng cao kỹ năng lập trình Lua</div>
+                <ul class="pricing-features">
+                    <li data-i18n="pricing.advanced.feature1"><strong>Kiến thức nâng cao</strong> – Học các kỹ thuật phức tạp</li>
+                    <li data-i18n="pricing.advanced.feature2"><strong>10 buổi học 1-1</strong> – Kèm riêng với giáo viên</li>
+                    <li data-i18n="pricing.advanced.feature3"><strong>Dự án nâng cao</strong> – Làm các dự án phức tạp hơn</li>
+                    <li data-i18n="pricing.advanced.feature4"><strong>Code review</strong> – Được review và tối ưu code</li>
+                    <li data-i18n="pricing.advanced.feature5"><strong>Hỗ trợ sau khóa</strong> – Được hỗ trợ sau khi học xong</li>
+                </ul>
+                <button class="pricing-btn" data-i18n="pricing.cta" onclick="document.getElementById('register-link').click()">Đăng Ký Ngay</button>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-type advanced" data-i18n="pricing.pro.title">Lua Professional</div>
+                <div class="pricing-price" data-vnd="7000000">7.000.000₫</div>
+                <div class="pricing-sessions" data-i18n="pricing.pro.sessions">15 Buổi Học</div>
+                <div class="pricing-desc" data-i18n="pricing.pro.desc">Trở thành chuyên gia Lua programming</div>
+                <ul class="pricing-features">
+                    <li data-i18n="pricing.pro.feature1"><strong>Kiến thức chuyên sâu</strong> – Master mọi khía cạnh của Lua</li>
+                    <li data-i18n="pricing.pro.feature2"><strong>15 buổi học 1-1</strong> – Kèm riêng với giáo viên</li>
+                    <li data-i18n="pricing.pro.feature3"><strong>Dự án thực tế</strong> – Làm các dự án production-ready</li>
+                    <li data-i18n="pricing.pro.feature4"><strong>Best practices</strong> – Học các best practices trong Lua</li>
+                    <li data-i18n="pricing.pro.feature5"><strong>Mentorship lâu dài</strong> – Được mentor trong thời gian dài</li>
+                </ul>
+                <button class="pricing-btn" data-i18n="pricing.cta" onclick="document.getElementById('register-link').click()">Đăng Ký Ngay</button>
+            </div>
+        </section>
+
+        <div class="pricing-section-title" data-i18n="pricing.hourly">Học Theo Giờ (Kèm 1-1)</div>
+        <section class="pricing-grid">
+            <div class="pricing-card hourly-card">
+                <div class="pricing-type standard" data-i18n="pricing.hourlyBeginner.title">Người Mới</div>
+                <div class="pricing-price" data-vnd="250000">250.000₫</div>
+                <div class="pricing-sessions" data-i18n="pricing.hourlyBeginner.unit">/ 1 Giờ</div>
+                <div class="pricing-desc" data-i18n="pricing.hourlyBeginner.desc">Học theo giờ cho người mới bắt đầu</div>
+                <ul class="pricing-features">
+                    <li data-i18n="pricing.hourlyBeginner.feature1"><strong>Linh hoạt thời gian</strong> – Học khi nào bạn muốn</li>
+                    <li data-i18n="pricing.hourlyBeginner.feature2"><strong>Kèm 1-1</strong> – Giáo viên chỉ dạy riêng bạn</li>
+                    <li data-i18n="pricing.hourlyBeginner.feature3"><strong>Tùy chỉnh nội dung</strong> – Học những gì bạn cần</li>
+                    <li data-i18n="pricing.hourlyBeginner.feature4"><strong>Thanh toán theo giờ</strong> – Chỉ trả tiền cho giờ học</li>
+                </ul>
+                <button class="pricing-btn" data-i18n="pricing.cta" onclick="document.getElementById('register-link').click()">Đăng Ký Ngay</button>
+            </div>
+            <div class="pricing-card hourly-card">
+                <div class="pricing-type pro" data-i18n="pricing.hourlyAdvanced.title">Nâng Cao</div>
+                <div class="pricing-price" data-vnd="350000">350.000₫</div>
+                <div class="pricing-sessions" data-i18n="pricing.hourlyAdvanced.unit">/ 1 Giờ</div>
+                <div class="pricing-desc" data-i18n="pricing.hourlyAdvanced.desc">Học theo giờ trình độ nâng cao</div>
+                <ul class="pricing-features">
+                    <li data-i18n="pricing.hourlyAdvanced.feature1"><strong>Linh hoạt thời gian</strong> – Học khi nào bạn muốn</li>
+                    <li data-i18n="pricing.hourlyAdvanced.feature2"><strong>Kèm 1-1</strong> – Giáo viên chỉ dạy riêng bạn</li>
+                    <li data-i18n="pricing.hourlyAdvanced.feature3"><strong>Chủ đề nâng cao</strong> – Học các chủ đề phức tạp</li>
+                    <li data-i18n="pricing.hourlyAdvanced.feature4"><strong>Thanh toán theo giờ</strong> – Chỉ trả tiền cho giờ học</li>
+                </ul>
+                <button class="pricing-btn" data-i18n="pricing.cta" onclick="document.getElementById('register-link').click()">Đăng Ký Ngay</button>
+            </div>
+            <div class="pricing-card hourly-card">
+                <div class="pricing-type advanced" data-i18n="pricing.hourlyPro.title">Chuyên Sâu</div>
+                <div class="pricing-price" data-vnd="450000">450.000₫</div>
+                <div class="pricing-sessions" data-i18n="pricing.hourlyPro.unit">/ 1 Giờ</div>
+                <div class="pricing-desc" data-i18n="pricing.hourlyPro.desc">Học theo giờ trình độ chuyên sâu</div>
+                <ul class="pricing-features">
+                    <li data-i18n="pricing.hourlyPro.feature1"><strong>Linh hoạt thời gian</strong> – Học khi nào bạn muốn</li>
+                    <li data-i18n="pricing.hourlyPro.feature2"><strong>Kèm 1-1</strong> – Giáo viên chỉ dạy riêng bạn</li>
+                    <li data-i18n="pricing.hourlyPro.feature3"><strong>Chủ đề chuyên sâu</strong> – Học các kỹ thuật cao cấp</li>
+                    <li data-i18n="pricing.hourlyPro.feature4"><strong>Thanh toán theo giờ</strong> – Chỉ trả tiền cho giờ học</li>
+                </ul>
+                <button class="pricing-btn" data-i18n="pricing.cta" onclick="document.getElementById('register-link').click()">Đăng Ký Ngay</button>
+            </div>
+        </section>
+
+        <div class="games-title" id="games" data-i18n="games.title">Dự Án Roblox Của Tôi</div>
+        <section class="games-showcase">
+            <div class="games-container">
+                <div class="games-scroll" id="games-scroll">
+                    <!-- Games will be loaded dynamically -->
+                </div>
+            </div>
+            <div class="games-instructions">
+                <p data-i18n="games.instructions"><i class="fas fa-info-circle"></i> Click vào game để chơi thử ngay! Dữ liệu được cập nhật tự động từ Roblox.</p>
+            </div>
+        </section>
+
+        <div class="partners-title" data-i18n="partners.title">Những Người Tôi Đã Từng Làm Cùng</div>
+        <section class="partners-showcase">
+            <div class="partners-container">
+                <div class="partners-scroll" id="partners-scroll"></div>
+            </div>
+        </section>
+
+        <div class="faq-title" data-i18n="faq.title">Câu Hỏi Thường Gặp</div>
+        <section class="faq-section">
+            <div class="faq-search-container">
+                <div class="faq-search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="faq-search" data-placeholder-vi="Tìm kiếm câu hỏi..." data-placeholder-en="Search for a question..." placeholder="Tìm kiếm câu hỏi...">
+                </div>
+                <button class="ask-question-btn" id="ask-question-btn" data-i18n="faq.ask">
+                    <i class="fas fa-plus"></i> Đặt Câu Hỏi
+                </button>
+            </div>
+            <div class="faq-grid" id="faq-grid">
+                <!-- FAQ items will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Register Selection Modal -->
+        <div id="register-selection-modal" class="modal-overlay">
+            <div class="modal-container selection-modal">
+                <button class="modal-close" id="selection-modal-close">&times;</button>
+                <div class="modal-header">
+                    <h2 data-i18n="selection.title">Chọn Phương Thức Đăng Ký</h2>
+                    <p class="modal-subtitle" data-i18n="selection.subtitle">Bạn muốn đăng ký qua phương thức nào?</p>
+                </div>
+                <div class="selection-buttons">
+                    <button class="selection-btn facebook-btn" id="facebook-register-btn">
+                        <i class="fab fa-facebook"></i>
+                        <span data-i18n="selection.facebook">Đăng Ký Qua Facebook</span>
+                    </button>
+                    <button class="selection-btn gmail-btn" id="gmail-register-btn">
+                        <i class="fas fa-envelope"></i>
+                        <span data-i18n="selection.gmail">Đăng Ký Qua Gmail</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Modal -->
+        <div id="registration-modal" class="modal-overlay">
+            <div class="modal-container">
+                <button class="modal-close" id="modal-close">&times;</button>
+                <div class="modal-header">
+                    <h2 data-i18n="register.title">Đăng Ký Làm Học Viên</h2>
+                </div>
+                <form class="contact-form" id="registration-form">
+            <div class="contact-row">
+                <div class="contact-field">
+                    <label for="contact-name" data-i18n="form.nameLabel">Họ và Tên *</label>
+                    <input type="text" id="contact-name" name="name" placeholder="Nhập họ và tên" data-placeholder-vi="Nhập họ và tên" data-placeholder-en="Enter your full name" required autocomplete="name">
+                </div>
+                <div class="contact-field">
+                    <label for="contact-email" data-i18n="form.emailLabel">Email *</label>
+                    <input type="email" id="contact-email" name="email" placeholder="Nhập email của bạn" data-placeholder-vi="Nhập email của bạn" data-placeholder-en="Enter your email" required autocomplete="email">
+                </div>
+            </div>
+            <div class="contact-row">
+            <div class="contact-field">
+                    <label for="contact-phone" data-i18n="form.phoneLabel">Số Điện Thoại *</label>
+                    <input type="tel" id="contact-phone" name="phone" placeholder="Nhập số điện thoại" data-placeholder-vi="Nhập số điện thoại" data-placeholder-en="Enter your phone number" required autocomplete="tel">
+            </div>
+            <div class="contact-field">
+                    <label for="course-type" data-i18n="form.courseLabel">Loại Khóa Học *</label>
+                    <select id="course-type" name="course-type" required>
+                        <option value="" data-label-vi="Chọn loại khóa học" data-label-en="Select a course">Chọn loại khóa học</option>
+                        <optgroup label="Khóa Học Theo Gói" data-label-vi="Khóa Học Theo Gói" data-label-en="Course Packages">
+                            <option value="beginner-course" data-price="3000000" data-label-vi="Người Mới" data-label-en="Beginner" data-sessions-vi="7 Buổi" data-sessions-en="7 Sessions">Người Mới (3.000.000₫ - 7 Buổi)</option>
+                            <option value="advanced-course" data-price="5000000" data-label-vi="Nâng Cao" data-label-en="Advanced" data-sessions-vi="10 Buổi" data-sessions-en="10 Sessions">Nâng Cao (5.000.000₫ - 10 Buổi)</option>
+                            <option value="professional-course" data-price="7000000" data-label-vi="Chuyên Sâu" data-label-en="Professional" data-sessions-vi="15 Buổi" data-sessions-en="15 Sessions">Chuyên Sâu (7.000.000₫ - 15 Buổi)</option>
+                        </optgroup>
+                        <optgroup label="Học Theo Giờ (Kèm 1-1)" data-label-vi="Học Theo Giờ (Kèm 1-1)" data-label-en="Hourly Coaching (1-on-1)">
+                            <option value="beginner-hourly" data-price="250000" data-label-vi="Người Mới" data-label-en="Beginner" data-per-vi="/giờ" data-per-en="/hour">Người Mới (250.000₫/giờ)</option>
+                            <option value="advanced-hourly" data-price="350000" data-label-vi="Nâng Cao" data-label-en="Advanced" data-per-vi="/giờ" data-per-en="/hour">Nâng Cao (350.000₫/giờ)</option>
+                            <option value="professional-hourly" data-price="450000" data-label-vi="Chuyên Sâu" data-label-en="Professional" data-per-vi="/giờ" data-per-en="/hour">Chuyên Sâu (450.000₫/giờ)</option>
+                        </optgroup>
+                    </select>
+            </div>
+            </div>
+            <div class="contact-field">
+                <label for="coupon-code" data-i18n="form.couponLabel">Mã Giảm Giá (Tùy chọn)</label>
+                <div class="coupon-input-group">
+                    <input type="text" id="coupon-code" name="coupon" placeholder="Nhập mã giảm giá" data-placeholder-vi="Nhập mã giảm giá" data-placeholder-en="Enter coupon code">
+                    <button type="button" id="apply-coupon" class="coupon-btn" data-i18n="form.applyCoupon">Áp dụng</button>
+                </div>
+                <div id="coupon-message" class="coupon-message"></div>
+            </div>
+            <div class="price-summary">
+                <div class="price-row">
+                    <span data-i18n="form.originalPrice">Giá gốc:</span>
+                    <span id="original-price">0₫</span>
+                </div>
+                <div class="price-row" id="discount-row" style="display:none;">
+                    <span data-i18n="form.discount">Giảm giá:</span>
+                    <span id="discount-amount" class="discount-text">-0₫</span>
+                </div>
+                <div class="price-row total">
+                    <span data-i18n="form.total">Tổng cộng:</span>
+                    <span id="final-price">0₫</span>
+                </div>
+            </div>
+            <div class="contact-field">
+                <label for="contact-message" data-i18n="form.messageLabel">Lời Nhắn / Yêu Cầu Thêm</label>
+                <textarea id="contact-message" name="message" placeholder="Ghi chú thêm về khóa học bạn muốn học, thời gian học mong muốn, v.v..." data-placeholder-vi="Ghi chú thêm về khóa học bạn muốn học, thời gian học mong muốn, v.v..." data-placeholder-en="Share any notes about your preferred course, schedule, etc." rows="4"></textarea>
+            </div>
+            <button type="submit" class="contact-btn" data-i18n="form.submit"><b>Gửi Đăng Ký</b> <span style="font-size:1.1em;vertical-align:middle;">→</span></button>
+        </form>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-main">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-title" data-i18n="footer.aboutTitle">Về Chúng Tôi</div>
+                    <div class="footer-desc" data-i18n="footer.aboutDesc">Đào tạo lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm. Học theo khóa học hoặc theo giờ, kèm 1-1.</div>
+                    <div class="footer-location"><i class="fas fa-map-marker-alt"></i> <span data-i18n="footer.location">Hà Nội, Việt Nam</span></div>
+                </div>
+                <div class="footer-section">
+                    <div class="footer-title" data-i18n="footer.contactTitle">Liên Hệ</div>
+            <div class="footer-contact">
+                <div><i class="fas fa-envelope"></i> <a href="mailto:dgkktok@gmail.com">dgkktok@gmail.com</a></div>
+                        <div><i class="fab fa-facebook"></i> <a href="https://www.facebook.com/dreamisdreamforever" id="facebook-link" target="_blank" data-i18n="footer.facebook">Facebook</a></div>
+            </div>
+                </div>
+                <div class="footer-section">
+                    <div class="footer-title" data-i18n="footer.linksTitle">Liên Kết</div>
+                    <div class="footer-links">
+                        <a href="/" data-i18n="footer.linkHome">Home</a>
+                        <a href="#pricing" data-i18n="footer.linkPricing">Pricing</a>
+                        <a href="#courses" data-i18n="footer.linkCourses">Courses</a>
+                        <a href="#contact" data-i18n="footer.linkRegister">Register</a>
+                        <a href="https://www.littlekhim.online/" target="_blank" data-i18n="footer.linkPortfolio">Portfolio</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+            <div class="footer-social-row">
+                    <a href="https://x.com/dgkktok" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="" target="_blank" title="Discord"><i class="fab fa-discord"></i></a>
+                    <a href="https://www.facebook.com/dreamisdreamforever" id="footer-facebook" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                </div>
+                <p data-i18n="footer.copyright">&copy; 2024 Đào Tạo Lua. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Dark Mode Button -->
+    <button id="dark-mode-btn" class="dark-mode-btn" title="Dark Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Dark Mode Page (Cheat Code Services) -->
+    <div id="dark-mode-page" class="dark-mode-page">
+        <button class="dark-mode-close" id="dark-mode-close">&times;</button>
+        <div class="dark-mode-content">
+            <h1 class="dark-mode-title" data-i18n="darkMode.title">Buôn Bán Làm Cheat Code Roblox</h1>
+            <div class="dark-mode-services">
+                <div class="dark-service-card">
+                    <i class="fas fa-code"></i>
+                    <h3 data-i18n="darkMode.scriptTitle">Script Roblox</h3>
+                    <p data-i18n="darkMode.scriptDesc">Tạo script tùy chỉnh cho game Roblox của bạn</p>
+                </div>
+                <div class="dark-service-card">
+                    <i class="fas fa-tools"></i>
+                    <h3 data-i18n="darkMode.fixTitle">Fix Script</h3>
+                    <p data-i18n="darkMode.fixDesc">Sửa lỗi và tối ưu hóa script hiện có</p>
+                </div>
+                <div class="dark-service-card">
+                    <i class="fas fa-wrench"></i>
+                    <h3 data-i18n="darkMode.makeTitle">Làm Script</h3>
+                    <p data-i18n="darkMode.makeDesc">Phát triển script mới từ đầu theo yêu cầu</p>
+                </div>
+            </div>
+            <div class="dark-mode-contact">
+                <p data-i18n="darkMode.contact">Liên hệ qua Facebook hoặc Email để đặt hàng</p>
+                <div class="dark-mode-buttons">
+                    <a href="https://www.facebook.com/dreamisdreamforever" target="_blank" class="dark-btn facebook-btn">
+                        <i class="fab fa-facebook"></i> Facebook
+                    </a>
+                    <a href="mailto:dgkktok@gmail.com" class="dark-btn email-btn">
+                        <i class="fas fa-envelope"></i> Email
+                    </a>
+                    <a href="store.html" class="dark-btn store-btn">
+                        <i class="fas fa-store"></i> <span data-i18n="darkMode.storeMode">Store Mode</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Header hide on scroll - chỉ hiện khi scroll lên cùng (gần đầu trang)
+    let lastScroll = 0;
+    const nav = document.getElementById('main-nav');
+    let ticking = false;
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const currentScroll = window.pageYOffset;
+                
+                // Nếu ở đầu trang (scroll < 50px), luôn hiện header
+                if (currentScroll < 50) {
+                    nav.classList.remove('nav-hidden');
+                    nav.classList.add('nav-visible');
+                } 
+                // Nếu scroll xuống, ẩn header
+                else if (currentScroll > lastScroll) {
+                    nav.classList.remove('nav-visible');
+                    nav.classList.add('nav-hidden');
+                }
+                // Chỉ hiện header khi scroll lên VÀ gần đầu trang (trong vòng 200px từ đầu)
+                else if (currentScroll < lastScroll && currentScroll < 200) {
+                    nav.classList.remove('nav-hidden');
+                    nav.classList.add('nav-visible');
+                }
+                
+                lastScroll = currentScroll;
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Home link scroll to top
+    document.getElementById('home-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // Stats animation - count đến số cuối
+    function animateValue(el, start, end, duration, suffix = '', isDecimal = false) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            
+            // Easing function for smooth animation
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            
+            let currentValue = start + (end - start) * easeOutQuart;
+            let value = isDecimal ? currentValue.toFixed(1) : Math.floor(currentValue);
+            
+            if (isDecimal) {
+                el.innerHTML = parseFloat(value).toFixed(1) + ' <span class="star">★</span>';
+            } else if (suffix) {
+                el.textContent = Math.floor(currentValue) + suffix;
+            } else {
+                el.textContent = Math.floor(currentValue);
+            }
+            
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                // Đảm bảo số cuối chính xác
+                if (isDecimal) {
+                    el.innerHTML = parseFloat(end).toFixed(1) + ' <span class="star">★</span>';
+                } else if (suffix) {
+                    el.textContent = Math.floor(end) + suffix;
+                } else {
+                    el.textContent = Math.floor(end);
+                }
+            }
+        };
+        requestAnimationFrame(step);
+    }
+
+    function runStatAnimations() {
+        document.querySelectorAll('.stat-value').forEach(el => {
+            const target = parseFloat(el.getAttribute('data-target'));
+            const suffix = el.getAttribute('data-suffix') || '';
+            const isDecimal = el.getAttribute('data-decimal') === 'true';
+            animateValue(el, 0, target, 1600, suffix, isDecimal);
+        });
+    }
+
+    let statsAnimated = false;
+    function handleStatsGridAnimation() {
+        const grid = document.querySelector('.stats-grid');
+        if (grid && isInViewport(grid) && !animatedElements.has('stats')) {
+            const direction = getScrollDirection();
+            grid.classList.add('visible');
+            grid.classList.add(direction === 'up' ? 'animate-up' : 'animate-down');
+            animatedElements.add('stats');
+            if (!statsAnimated) {
+                runStatAnimations();
+                statsAnimated = true;
+            }
+        }
+    }
+
+    // Scroll animations với pop-up effect
+    function isInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top < window.innerHeight &&
+            rect.bottom > 0
+        );
+    }
+
+    // Scroll direction detection và animation tracking
+    let lastScrollTop = 0;
+    const animatedElements = new Set();
+    
+    function getScrollDirection() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const direction = scrollTop > lastScrollTop ? 'down' : 'up';
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        return direction;
+    }
+
+    // Languages grid entrance animation với pop-up
+    function handleLanguagesAnimation() {
+        const lang = document.querySelector('.languages-grid');
+        if (lang && isInViewport(lang) && !animatedElements.has('languages')) {
+            const direction = getScrollDirection();
+            lang.classList.add('visible');
+            lang.classList.add(direction === 'up' ? 'animate-up' : 'animate-down');
+            animatedElements.add('languages');
+        }
+    }
+
+    // Why grid entrance animation với pop-up
+    function handleWhyAnimation() {
+        const why = document.querySelector('.why-grid');
+        if (why && isInViewport(why) && !animatedElements.has('why')) {
+            const direction = getScrollDirection();
+            why.classList.add('visible');
+            why.classList.add(direction === 'up' ? 'animate-up' : 'animate-down');
+            animatedElements.add('why');
+        }
+    }
+
+    // Pricing grid entrance animation với pop-up
+    function handlePricingAnimation() {
+        const pricing = document.querySelectorAll('.pricing-grid');
+        pricing.forEach((grid, index) => {
+            const key = `pricing-${index}`;
+            if (isInViewport(grid) && !animatedElements.has(key)) {
+                const direction = getScrollDirection();
+                grid.classList.add('visible');
+                grid.classList.add(direction === 'up' ? 'animate-up' : 'animate-down');
+                animatedElements.add(key);
+            }
+        });
+    }
+
+    // Contact form entrance animation với pop-up
+    function handleContactAnimation() {
+        const contact = document.querySelector('.contact-form');
+        if (contact && isInViewport(contact) && !animatedElements.has('contact')) {
+            const direction = getScrollDirection();
+            contact.classList.add('visible');
+            contact.classList.add(direction === 'up' ? 'animate-up' : 'animate-down');
+            animatedElements.add('contact');
+        }
+    }
+
+    // Register Selection Modal
+    const selectionModal = document.getElementById('register-selection-modal');
+    const registrationModal = document.getElementById('registration-modal');
+    const registerLink = document.getElementById('register-link');
+    const selectionModalClose = document.getElementById('selection-modal-close');
+    const facebookRegisterBtn = document.getElementById('facebook-register-btn');
+    const gmailRegisterBtn = document.getElementById('gmail-register-btn');
+    const modalClose = document.getElementById('modal-close');
+    const courseSelect = document.getElementById('course-type');
+    const couponInput = document.getElementById('coupon-code');
+    const applyCouponBtn = document.getElementById('apply-coupon');
+    const couponMessage = document.getElementById('coupon-message');
+
+    let currentDiscount = 0;
+    const validCoupon = 'MinhDuc';
+    const discountPercent = 10;
+    const facebookLink = 'https://www.facebook.com/dreamisdreamforever'; // Thay bằng link Facebook thật của bạn
+
+    let currentLanguage = 'vi';
+    let currentCurrency = 'VND';
+    const exchangeRate = 24000;
+
+    // Global state
+    let faqData = [];
+    let partnersData = [];
+    let robloxGames = [];
+    let loadedGames = [];
+
+    const translations = {
+        vi: {
+            'meta.title': 'Đào Tạo Lập Trình Lua - Khóa Học Lua Chuyên Nghiệp',
+            'nav.home': 'Home',
+            'nav.pricing': 'Pricing',
+            'nav.courses': 'Courses',
+            'nav.register': 'Register',
+            'nav.portfolio': 'Portfolio',
+            'hero.title': 'Đào Tạo Lập Trình Lua',
+            'hero.subtitle': 'Học lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm',
+            'hero.tagline': 'Khóa học theo gói hoặc học theo giờ - Kèm 1-1 cá nhân hóa',
+            'hero.ctaPricing': 'Xem Bảng Giá',
+            'hero.ctaRegister': 'Đăng Ký Ngay',
+            'stats.title': 'Thống Kê Đào Tạo',
+            'stats.students': 'Học Viên Đã Đăng Ký',
+            'stats.rating': 'Đánh Giá Trung Bình',
+            'languages.title': 'Ngôn Ngữ Lập Trình',
+            'languages.lua': 'Lua',
+            'why.title': 'Tại Sao <span class="accent">Chọn Chúng Tôi?</span>',
+            'why.card1.title': 'Kèm 1-1 Cá Nhân Hóa',
+            'why.card1.desc': 'Học <span class="accent">trực tiếp 1-1</span> với giáo viên, được <span class="accent">hỗ trợ tận tình</span> và <span class="accent">theo dõi tiến độ</span> từng bước một cách chi tiết.',
+            'why.card2.title': 'Chương Trình Học Bài Bản',
+            'why.card2.desc': 'Chương trình được <span class="accent">thiết kế chuyên nghiệp</span>, từ cơ bản đến nâng cao, phù hợp với <span class="accent">mọi trình độ</span> của học viên.',
+            'why.card3.title': 'Thực Hành Thực Tế',
+            'why.card3.desc': 'Học đi đôi với <span class="accent">hành</span>, làm các <span class="accent">dự án thực tế</span> để nắm vững kiến thức và <span class="accent">kinh nghiệm</span> lập trình.',
+            'why.card4.title': 'Linh Hoạt Thời Gian',
+            'why.card4.desc': 'Có thể học <span class="accent">theo khóa học</span> hoặc <span class="accent">theo giờ</span>, linh hoạt phù hợp với <span class="accent">lịch trình</span> của bạn.',
+            'why.card5.title': 'Giáo Viên Kinh Nghiệm',
+            'why.card5.desc': 'Giáo viên có <span class="accent">4+ năm kinh nghiệm</span> lập trình Lua, <span class="accent">nhiệt tình</span> và <span class="accent">chuyên nghiệp</span>.',
+            'why.card6.title': 'Hỗ Trợ Sau Khóa Học',
+            'why.card6.desc': 'Được <span class="accent">hỗ trợ</span> và <span class="accent">giải đáp thắc mắc</span> ngay cả sau khi hoàn thành khóa học.',
+            'pricing.title': 'Bảng Giá Khóa Học',
+            'pricing.packages': 'Khóa Học Theo Gói',
+            'pricing.hourly': 'Học Theo Giờ (Kèm 1-1)',
+            'pricing.beginner.title': 'Lua Beginner',
+            'pricing.beginner.sessions': '7 Buổi Học',
+            'pricing.beginner.desc': 'Dành cho người mới bắt đầu học Lua',
+            'pricing.beginner.feature1': '<strong>Kiến thức cơ bản</strong> – Học từ đầu về Lua programming',
+            'pricing.beginner.feature2': '<strong>7 buổi học 1-1</strong> – Kèm riêng với giáo viên',
+            'pricing.beginner.feature3': '<strong>Tài liệu học tập</strong> – Đầy đủ tài liệu và bài tập',
+            'pricing.beginner.feature4': '<strong>Thực hành dự án</strong> – Làm các dự án thực tế',
+            'pricing.advanced.title': 'Lua Advanced',
+            'pricing.advanced.sessions': '10 Buổi Học',
+            'pricing.advanced.desc': 'Nâng cao kỹ năng lập trình Lua',
+            'pricing.advanced.feature1': '<strong>Kiến thức nâng cao</strong> – Học các kỹ thuật phức tạp',
+            'pricing.advanced.feature2': '<strong>10 buổi học 1-1</strong> – Kèm riêng với giáo viên',
+            'pricing.advanced.feature3': '<strong>Dự án nâng cao</strong> – Làm các dự án phức tạp hơn',
+            'pricing.advanced.feature4': '<strong>Code review</strong> – Được review và tối ưu code',
+            'pricing.advanced.feature5': '<strong>Hỗ trợ sau khóa</strong> – Được hỗ trợ sau khi học xong',
+            'pricing.pro.title': 'Lua Professional',
+            'pricing.pro.sessions': '15 Buổi Học',
+            'pricing.pro.desc': 'Trở thành chuyên gia Lua programming',
+            'pricing.pro.feature1': '<strong>Kiến thức chuyên sâu</strong> – Master mọi khía cạnh của Lua',
+            'pricing.pro.feature2': '<strong>15 buổi học 1-1</strong> – Kèm riêng với giáo viên',
+            'pricing.pro.feature3': '<strong>Dự án thực tế</strong> – Làm các dự án production-ready',
+            'pricing.pro.feature4': '<strong>Best practices</strong> – Học các best practices trong Lua',
+            'pricing.pro.feature5': '<strong>Mentorship lâu dài</strong> – Được mentor trong thời gian dài',
+            'pricing.hourlyBeginner.title': 'Người Mới',
+            'pricing.hourlyBeginner.unit': '/ 1 Giờ',
+            'pricing.hourlyBeginner.desc': 'Học theo giờ cho người mới bắt đầu',
+            'pricing.hourlyBeginner.feature1': '<strong>Linh hoạt thời gian</strong> – Học khi nào bạn muốn',
+            'pricing.hourlyBeginner.feature2': '<strong>Kèm 1-1</strong> – Giáo viên chỉ dạy riêng bạn',
+            'pricing.hourlyBeginner.feature3': '<strong>Tùy chỉnh nội dung</strong> – Học những gì bạn cần',
+            'pricing.hourlyBeginner.feature4': '<strong>Thanh toán theo giờ</strong> – Chỉ trả tiền cho giờ học',
+            'pricing.hourlyAdvanced.title': 'Nâng Cao',
+            'pricing.hourlyAdvanced.unit': '/ 1 Giờ',
+            'pricing.hourlyAdvanced.desc': 'Học theo giờ trình độ nâng cao',
+            'pricing.hourlyAdvanced.feature1': '<strong>Linh hoạt thời gian</strong> – Học khi nào bạn muốn',
+            'pricing.hourlyAdvanced.feature2': '<strong>Kèm 1-1</strong> – Giáo viên chỉ dạy riêng bạn',
+            'pricing.hourlyAdvanced.feature3': '<strong>Chủ đề nâng cao</strong> – Học các chủ đề phức tạp',
+            'pricing.hourlyAdvanced.feature4': '<strong>Thanh toán theo giờ</strong> – Chỉ trả tiền cho giờ học',
+            'pricing.hourlyPro.title': 'Chuyên Sâu',
+            'pricing.hourlyPro.unit': '/ 1 Giờ',
+            'pricing.hourlyPro.desc': 'Học theo giờ trình độ chuyên sâu',
+            'pricing.hourlyPro.feature1': '<strong>Linh hoạt thời gian</strong> – Học khi nào bạn muốn',
+            'pricing.hourlyPro.feature2': '<strong>Kèm 1-1</strong> – Giáo viên chỉ dạy riêng bạn',
+            'pricing.hourlyPro.feature3': '<strong>Chủ đề chuyên sâu</strong> – Học các kỹ thuật cao cấp',
+            'pricing.hourlyPro.feature4': '<strong>Thanh toán theo giờ</strong> – Chỉ trả tiền cho giờ học',
+            'pricing.cta': 'Đăng Ký Ngay',
+            'games.title': 'Dự Án Roblox Của Tôi',
+            'games.instructions': '<i class="fas fa-info-circle"></i> Click vào game để chơi thử ngay! Dữ liệu được cập nhật tự động từ Roblox.',
+            'games.playing': 'Đang chơi',
+            'games.visits': 'Lượt Chơi',
+            'games.empty': 'Chưa có game nào. Vui lòng thêm game vào data/projects.json.',
+            'games.loading': 'Đang tải thông tin game...',
+            'games.fail': 'Không thể tải thông tin game. Vui lòng kiểm tra lại data/projects.json.',
+            'partners.title': 'Những Người Tôi Đã Từng Làm Cùng',
+            'partners.placeholderName': 'Đang cập nhật',
+            'partners.placeholderRole': 'Updating',
+            'faq.title': 'Câu Hỏi Thường Gặp',
+            'faq.ask': 'Đặt Câu Hỏi',
+            'faq.noResults': 'Không tìm thấy câu hỏi nào. Vui lòng thử lại với từ khóa khác.',
+            'selection.title': 'Chọn Phương Thức Đăng Ký',
+            'selection.subtitle': 'Bạn muốn đăng ký qua phương thức nào?',
+            'selection.facebook': 'Đăng Ký Qua Facebook',
+            'selection.gmail': 'Đăng Ký Qua Gmail',
+            'register.title': 'Đăng Ký Làm Học Viên',
+            'form.nameLabel': 'Họ và Tên *',
+            'form.emailLabel': 'Email *',
+            'form.phoneLabel': 'Số Điện Thoại *',
+            'form.courseLabel': 'Loại Khóa Học *',
+            'form.couponLabel': 'Mã Giảm Giá (Tùy chọn)',
+            'form.applyCoupon': 'Áp dụng',
+            'form.originalPrice': 'Giá gốc:',
+            'form.discount': 'Giảm giá:',
+            'form.total': 'Tổng cộng:',
+            'form.messageLabel': 'Lời Nhắn / Yêu Cầu Thêm',
+            'form.submit': '<b>Gửi Đăng Ký</b> <span style="font-size:1.1em;vertical-align:middle;">→</span>',
+            'form.couponSuccess': '✓ Mã giảm giá hợp lệ! Bạn được giảm 10%.',
+            'form.couponInvalid': '✗ Mã giảm giá không hợp lệ.',
+            'form.submitSuccess': 'Cảm ơn bạn đã đăng ký! Email đã được mở. Nếu email không mở tự động, vui lòng gửi email đến dgkktok@gmail.com với thông tin trên.',
+            'footer.aboutTitle': 'Về Chúng Tôi',
+            'footer.aboutDesc': 'Đào tạo lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm. Học theo khóa học hoặc theo giờ, kèm 1-1.',
+            'footer.location': 'Hà Nội, Việt Nam',
+            'footer.contactTitle': 'Liên Hệ',
+            'footer.facebook': 'Facebook',
+            'footer.linksTitle': 'Liên Kết',
+            'footer.linkHome': 'Trang Chủ',
+            'footer.linkPricing': 'Bảng Giá',
+            'footer.linkCourses': 'Khóa Học',
+            'footer.linkRegister': 'Đăng Ký',
+            'footer.linkPortfolio': 'Portfolio',
+            'footer.caption': '',
+            'footer.copyright': '&copy; 2024 Đào Tạo Lua. Tất cả quyền được bảo lưu.',
+            'darkMode.title': 'Buôn Bán Làm Cheat Code Roblox',
+            'darkMode.scriptTitle': 'Script Roblox',
+            'darkMode.scriptDesc': 'Tạo script tùy chỉnh cho game Roblox của bạn',
+            'darkMode.fixTitle': 'Fix Script',
+            'darkMode.fixDesc': 'Sửa lỗi và tối ưu hóa script hiện có',
+            'darkMode.makeTitle': 'Làm Script',
+            'darkMode.makeDesc': 'Phát triển script mới từ đầu theo yêu cầu',
+            'darkMode.contact': 'Liên hệ qua Facebook hoặc Email để đặt hàng',
+            'darkMode.storeMode': 'Store Mode'
+        },
+        en: {
+            'meta.title': 'Lua Programming Training - Professional Lua Courses',
+            'nav.home': 'Home',
+            'nav.pricing': 'Pricing',
+            'nav.courses': 'Courses',
+            'nav.register': 'Register',
+            'nav.portfolio': 'Portfolio',
+            'hero.title': 'Lua Programming Training',
+            'hero.subtitle': 'Learn professional Lua programming with a tutor who has 4+ years of experience',
+            'hero.tagline': 'Choose structured courses or hourly 1-on-1 coaching tailored to you',
+            'hero.ctaPricing': 'View Pricing',
+            'hero.ctaRegister': 'Register Now',
+            'stats.title': 'Training Statistics',
+            'stats.students': 'Students Enrolled',
+            'stats.rating': 'Average Rating',
+            'languages.title': 'Programming Language',
+            'languages.lua': 'Lua',
+            'why.title': 'Why <span class="accent">Learn With Us?</span>',
+            'why.card1.title': 'Personalized 1-on-1 Coaching',
+            'why.card1.desc': 'Learn <span class="accent">directly 1-on-1</span> with your instructor, receive <span class="accent">dedicated support</span>, and have your progress <span class="accent">tracked in detail</span>.',
+            'why.card2.title': 'Structured Curriculum',
+            'why.card2.desc': 'A <span class="accent">professionally designed</span> curriculum from beginner to advanced, tailored for <span class="accent">every level</span>.',
+            'why.card3.title': 'Real-World Practice',
+            'why.card3.desc': 'Combine theory with <span class="accent">hands-on projects</span> to retain knowledge and <span class="accent">practical experience</span>.',
+            'why.card4.title': 'Flexible Scheduling',
+            'why.card4.desc': 'Study through <span class="accent">packages</span> or <span class="accent">hourly sessions</span>, flexible to match <span class="accent">your timetable</span>.',
+            'why.card5.title': 'Experienced Instructor',
+            'why.card5.desc': 'A tutor with <span class="accent">4+ years of Lua experience</span>, <span class="accent">dedicated</span> and <span class="accent">professional</span>.',
+            'why.card6.title': 'Post-course Support',
+            'why.card6.desc': 'Receive <span class="accent">support</span> and <span class="accent">answers</span> even after you finish the course.',
+            'pricing.title': 'Course Pricing',
+            'pricing.packages': 'Course Packages',
+            'pricing.hourly': 'Hourly Coaching (1-on-1)',
+            'pricing.beginner.title': 'Lua Beginner',
+            'pricing.beginner.sessions': '7 Sessions',
+            'pricing.beginner.desc': 'Perfect for brand-new Lua learners',
+            'pricing.beginner.feature1': '<strong>Core fundamentals</strong> – Learn Lua from the ground up',
+            'pricing.beginner.feature2': '<strong>7 private lessons</strong> – 1-on-1 tutoring every session',
+            'pricing.beginner.feature3': '<strong>Learning materials</strong> – Complete notes and exercises',
+            'pricing.beginner.feature4': '<strong>Project practice</strong> – Build real-world mini projects',
+            'pricing.advanced.title': 'Lua Advanced',
+            'pricing.advanced.sessions': '10 Sessions',
+            'pricing.advanced.desc': 'Upgrade your Lua programming skills',
+            'pricing.advanced.feature1': '<strong>Advanced topics</strong> – Dive into complex techniques',
+            'pricing.advanced.feature2': '<strong>10 private lessons</strong> – Personal guidance each time',
+            'pricing.advanced.feature3': '<strong>Advanced projects</strong> – Work on challenging scenarios',
+            'pricing.advanced.feature4': '<strong>Code reviews</strong> – Get feedback and optimizations',
+            'pricing.advanced.feature5': '<strong>After-course support</strong> – Stay connected for help',
+            'pricing.pro.title': 'Lua Professional',
+            'pricing.pro.sessions': '15 Sessions',
+            'pricing.pro.desc': 'Become a Lua specialist',
+            'pricing.pro.feature1': '<strong>Expert knowledge</strong> – Master every aspect of Lua',
+            'pricing.pro.feature2': '<strong>15 private lessons</strong> – One-on-one mentoring',
+            'pricing.pro.feature3': '<strong>Production projects</strong> – Build launch-ready systems',
+            'pricing.pro.feature4': '<strong>Best practices</strong> – Learn industry standards',
+            'pricing.pro.feature5': '<strong>Long-term mentorship</strong> – Continued guidance',
+            'pricing.hourlyBeginner.title': 'Beginner',
+            'pricing.hourlyBeginner.unit': '/ Hour',
+            'pricing.hourlyBeginner.desc': 'Hourly sessions for new learners',
+            'pricing.hourlyBeginner.feature1': '<strong>Flexible schedule</strong> – Study when it suits you',
+            'pricing.hourlyBeginner.feature2': '<strong>1-on-1 coaching</strong> – Private instructor support',
+            'pricing.hourlyBeginner.feature3': '<strong>Custom content</strong> – Focus on what you need',
+            'pricing.hourlyBeginner.feature4': '<strong>Pay as you go</strong> – Only pay for hours used',
+            'pricing.hourlyAdvanced.title': 'Advanced',
+            'pricing.hourlyAdvanced.unit': '/ Hour',
+            'pricing.hourlyAdvanced.desc': 'Hourly coaching for advanced topics',
+            'pricing.hourlyAdvanced.feature1': '<strong>Flexible schedule</strong> – Study on your terms',
+            'pricing.hourlyAdvanced.feature2': '<strong>1-on-1 coaching</strong> – Dedicated guidance',
+            'pricing.hourlyAdvanced.feature3': '<strong>Advanced topics</strong> – Learn complex features',
+            'pricing.hourlyAdvanced.feature4': '<strong>Pay as you go</strong> – Budget-friendly for busy people',
+            'pricing.hourlyPro.title': 'Professional',
+            'pricing.hourlyPro.unit': '/ Hour',
+            'pricing.hourlyPro.desc': 'Hourly coaching for expert-level goals',
+            'pricing.hourlyPro.feature1': '<strong>Flexible schedule</strong> – Learn anytime',
+            'pricing.hourlyPro.feature2': '<strong>1-on-1 coaching</strong> – Exclusive instruction',
+            'pricing.hourlyPro.feature3': '<strong>Deep topics</strong> – Explore advanced techniques',
+            'pricing.hourlyPro.feature4': '<strong>Pay as you go</strong> – Only pay per hour',
+            'pricing.cta': 'Enroll Now',
+            'games.title': 'My Roblox Projects',
+            'games.instructions': '<i class="fas fa-info-circle"></i> Click a game to try it now! Data updates automatically from Roblox.',
+            'games.playing': 'Playing',
+            'games.visits': 'Visits',
+            'games.empty': 'No games available. Please add them in data/projects.json.',
+            'games.loading': 'Loading game details...',
+            'games.fail': 'Unable to load game data. Please verify data/projects.json.',
+            'partners.title': 'People I Have Worked With',
+            'partners.placeholderName': 'Updating',
+            'partners.placeholderRole': 'Updating',
+            'faq.title': 'Frequently Asked Questions',
+            'faq.ask': 'Ask a Question',
+            'faq.noResults': 'No questions found. Please try a different keyword.',
+            'selection.title': 'Choose a Registration Method',
+            'selection.subtitle': 'Which channel would you like to register through?',
+            'selection.facebook': 'Register via Facebook',
+            'selection.gmail': 'Register with Gmail',
+            'register.title': 'Become a Student',
+            'form.nameLabel': 'Full Name *',
+            'form.emailLabel': 'Email *',
+            'form.phoneLabel': 'Phone Number *',
+            'form.courseLabel': 'Course Type *',
+            'form.couponLabel': 'Discount Code (Optional)',
+            'form.applyCoupon': 'Apply',
+            'form.originalPrice': 'Original Price:',
+            'form.discount': 'Discount:',
+            'form.total': 'Total:',
+            'form.messageLabel': 'Notes / Additional Requests',
+            'form.submit': '<b>Submit Registration</b> <span style="font-size:1.1em;vertical-align:middle;">→</span>',
+            'form.couponSuccess': '✓ Coupon applied! You received 10% off.',
+            'form.couponInvalid': '✗ Invalid coupon code.',
+            'form.submitSuccess': 'Thanks for registering! Your email client has been opened. If not, please email dgkktok@gmail.com with the details above.',
+            'footer.aboutTitle': 'About Me',
+            'footer.aboutDesc': 'Professional Lua training with 4+ years of experience. Learn via structured courses or hourly 1-on-1 sessions.',
+            'footer.location': 'Hanoi, Vietnam',
+            'footer.contactTitle': 'Contact',
+            'footer.facebook': 'Facebook',
+            'footer.linksTitle': 'Links',
+            'footer.linkHome': 'Home',
+            'footer.linkPricing': 'Pricing',
+            'footer.linkCourses': 'Courses',
+            'footer.linkRegister': 'Register',
+            'footer.linkPortfolio': 'Portfolio',
+            'footer.copyright': '&copy; 2024 Lua Training. All rights reserved.',
+            'darkMode.title': 'Roblox Cheat Code Services',
+            'darkMode.scriptTitle': 'Roblox Script',
+            'darkMode.scriptDesc': 'Create custom scripts for your Roblox games',
+            'darkMode.fixTitle': 'Fix Script',
+            'darkMode.fixDesc': 'Fix bugs and optimize existing scripts',
+            'darkMode.makeTitle': 'Create Script',
+            'darkMode.makeDesc': 'Develop new scripts from scratch as requested',
+            'darkMode.contact': 'Contact via Facebook or Email to place an order',
+            'darkMode.storeMode': 'Store Mode'
+        }
+    };
+
+    function applyTranslations() {
+        document.documentElement.setAttribute('lang', currentLanguage);
+
+        const translatedTitle = translations[currentLanguage]?.['meta.title'];
+        if (translatedTitle) {
+            document.title = translatedTitle;
+        }
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            const translated = translations[currentLanguage]?.[key];
+            if (translated !== undefined) {
+                el.innerHTML = translated;
+            }
+        });
+
+        document.querySelectorAll('[data-placeholder-vi]').forEach(el => {
+            const placeholder = currentLanguage === 'en' ? el.dataset.placeholderEn : el.dataset.placeholderVi;
+            if (placeholder !== undefined) {
+                el.setAttribute('placeholder', placeholder);
+            }
+        });
+
+        const faqSearch = document.getElementById('faq-search');
+        if (faqSearch) {
+            const placeholder = currentLanguage === 'en' ? faqSearch.dataset.placeholderEn : faqSearch.dataset.placeholderVi;
+            if (placeholder) {
+                faqSearch.setAttribute('placeholder', placeholder);
+            }
+        }
+
+        document.querySelectorAll('#course-type optgroup[data-label-vi]').forEach(group => {
+            const label = currentLanguage === 'en' ? (group.dataset.labelEn || group.dataset.labelVi) : (group.dataset.labelVi || group.dataset.labelEn);
+            if (label) {
+                group.label = label;
+            }
+        });
+
+        const languageToggleBtn = document.getElementById('language-toggle');
+        if (languageToggleBtn) {
+            languageToggleBtn.textContent = currentLanguage === 'vi' ? 'EN' : 'VI';
+            languageToggleBtn.setAttribute('aria-label', currentLanguage === 'vi' ? 'Switch to English' : 'Chuyển sang tiếng Việt');
+        }
+    }
+
+    function formatCurrency(amount) {
+        if (currentCurrency === 'USD') {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount / exchangeRate);
+        }
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    }
+
+    function updateDisplayedPrices() {
+        document.querySelectorAll('[data-vnd]').forEach(el => {
+            const base = parseInt(el.dataset.vnd, 10) || 0;
+            el.textContent = formatCurrency(base);
+        });
+    }
+
+    function updateCourseOptions() {
+        const courseSelect = document.getElementById('course-type');
+        if (!courseSelect) return;
+
+        Array.from(courseSelect.options).forEach(option => {
+            const labelVi = option.dataset.labelVi;
+            const labelEn = option.dataset.labelEn;
+            const sessionsVi = option.dataset.sessionsVi;
+            const sessionsEn = option.dataset.sessionsEn;
+            const perVi = option.dataset.perVi;
+            const perEn = option.dataset.perEn;
+            const basePrice = option.dataset.price ? parseInt(option.dataset.price, 10) : null;
+
+            if (option.value === '') {
+                const baseLabel = currentLanguage === 'en' ? (option.dataset.labelEn || option.dataset.labelVi || option.textContent) : (option.dataset.labelVi || option.dataset.labelEn || option.textContent);
+                option.textContent = baseLabel;
+                return;
+            }
+
+            let label = currentLanguage === 'en' ? (labelEn || labelVi || option.textContent) : (labelVi || labelEn || option.textContent);
+            if (basePrice) {
+                if (sessionsVi || sessionsEn) {
+                    const sessions = currentLanguage === 'en' ? (sessionsEn || sessionsVi || '') : (sessionsVi || sessionsEn || '');
+                    label += ` (${formatCurrency(basePrice)}${sessions ? ` - ${sessions}` : ''})`;
+                } else if (perVi || perEn) {
+                    const per = currentLanguage === 'en' ? (perEn || perVi || '') : (perVi || perEn || '');
+                    label += ` (${formatCurrency(basePrice)}${per || ''})`;
+                } else {
+                    label += ` (${formatCurrency(basePrice)})`;
+                }
+            }
+            option.textContent = label;
+        });
+    }
+
+    function setCurrency(currency) {
+        const newCurrency = currency === 'USD' ? 'USD' : 'VND';
+        if (currentCurrency === newCurrency) return;
+        currentCurrency = newCurrency;
+        updateDisplayedPrices();
+        updateCourseOptions();
+        updatePrice();
+    }
+
+    function setLanguage(lang) {
+        const normalized = lang === 'en' ? 'en' : 'vi';
+        if (currentLanguage === normalized) {
+            applyTranslations();
+            updateCourseOptions();
+            return;
+        }
+        currentLanguage = normalized;
+        setCurrency(currentLanguage === 'en' ? 'USD' : 'VND');
+        applyTranslations();
+        renderPartners();
+        renderGames();
+        const faqSearch = document.getElementById('faq-search');
+        if (faqSearch && faqSearch.value.trim()) {
+            searchFAQs(faqSearch.value);
+        } else {
+            displayFAQs(faqData);
+        }
+        updateCourseOptions();
+
+        if (couponMessage) {
+            if (couponMessage.classList.contains('coupon-success')) {
+                couponMessage.textContent = translations[currentLanguage]?.['form.couponSuccess'] || couponMessage.textContent;
+            } else if (couponMessage.classList.contains('coupon-error')) {
+                couponMessage.textContent = translations[currentLanguage]?.['form.couponInvalid'] || couponMessage.textContent;
+            }
+        }
+    }
+
+    function detectLocale() {
+        const userLang = (navigator.language || navigator.userLanguage || 'vi').toLowerCase();
+        if (!userLang.startsWith('vi')) {
+            setLanguage('en');
+        } else {
+            setLanguage('vi');
+        }
+    }
+
+    // FAQ Search and Display
+    function getFaqText(entry, key) {
+        if (!entry) return '';
+        if (typeof entry === 'string') return entry;
+        return entry[currentLanguage] || entry.vi || entry.en || '';
+    }
+
+    function displayFAQs(faqs) {
+        const faqGrid = document.getElementById('faq-grid');
+        if (faqs.length === 0) {
+            const noResultText = translations[currentLanguage]?.['faq.noResults'] || 'Không tìm thấy câu hỏi nào. Vui lòng thử lại với từ khóa khác.';
+            faqGrid.innerHTML = `<div class="faq-no-results">${noResultText}</div>`;
+            return;
+        }
+
+        faqGrid.innerHTML = faqs.map(faq => `
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question-circle"></i>
+                    <span>${getFaqText(faq.question)}</span>
+                </div>
+                <div class="faq-answer">${getFaqText(faq.answer)}</div>
+            </div>
+        `).join('');
+    }
+
+    function searchFAQs(query) {
+        const lowerQuery = (query || '').toLowerCase().trim();
+        if (!lowerQuery) {
+            displayFAQs(faqData);
+            return;
+        }
+
+        const filtered = (faqData || []).filter(faq => {
+            const questionText = getFaqText(faq.question).toLowerCase();
+            const answerText = getFaqText(faq.answer).toLowerCase();
+            const tags = Array.isArray(faq.tags) ? faq.tags : [];
+            const tagMatch = tags.some(tag => (tag || '').toLowerCase().includes(lowerQuery));
+            return questionText.includes(lowerQuery) || answerText.includes(lowerQuery) || tagMatch;
+        });
+
+        displayFAQs(filtered);
+    }
+
+    // Initialize FAQ
+    function initializeFAQ() {
+        const faqGrid = document.getElementById('faq-grid');
+        if (!faqGrid) return;
+        
+        displayFAQs(faqData);
+        
+        const faqSearch = document.getElementById('faq-search');
+        if (faqSearch) {
+            faqSearch.addEventListener('input', function() {
+                searchFAQs(this.value);
+            });
+        }
+
+        // Ask question button
+        const askBtn = document.getElementById('ask-question-btn');
+        if (askBtn) {
+            askBtn.addEventListener('click', function() {
+                window.open(facebookLink, '_blank');
+            });
+        }
+    }
+
+    function renderPartners() {
+        
+        const partnersScroll = document.getElementById('partners-scroll');
+        if (!partnersScroll) return;
+
+        if (!Array.isArray(partnersData) || partnersData.length === 0) {
+            const placeholderName = translations[currentLanguage]?.['partners.placeholderName'] || 'Đang cập nhật';
+            const placeholderRole = translations[currentLanguage]?.['partners.placeholderRole'] || 'Updating';
+            partnersScroll.innerHTML = `<div class="partner-card"><div class="partner-avatar"><i class="fas fa-user"></i></div><div class="partner-name">${placeholderName}</div><div class="partner-role">${placeholderRole}</div></div>`;
+            return;
+        }
+
+        const buildCard = (partner) => {
+            const roleText = partner.role && (partner.role[currentLanguage] || partner.role.vi || partner.role.en || '');
+            const nameText = currentLanguage === 'en' && partner.nameEn ? partner.nameEn : partner.name;
+            const descriptionText = partner.description && (partner.description[currentLanguage] || partner.description.vi || partner.description.en || '');
+            const icon = partner.icon || 'fas fa-user';
+            return `
+                <div class="partner-card">
+                    <div class="partner-avatar">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="partner-name">${nameText}</div>
+                    <div class="partner-role">${roleText}</div>
+                    ${descriptionText ? `<div class="partner-description">${descriptionText}</div>` : ''}
+                </div>
+            `;
+        };
+
+        const baseContent = partnersData.map(buildCard).join('');
+        partnersScroll.innerHTML = baseContent + baseContent;
+    }
+
+    function renderGames() {
+        const gamesScroll = document.getElementById('games-scroll');
+        if (!gamesScroll) return;
+
+        if (!loadedGames || loadedGames.length === 0) {
+            const emptyText = translations[currentLanguage]?.['games.empty'] || 'Chưa có game nào. Vui lòng thêm game vào data/projects.json.';
+            gamesScroll.innerHTML = `<div class="game-placeholder">${emptyText}</div>`;
+            return;
+        }
+
+        const createCard = (game) => {
+            const config = game.config || {};
+            const displayName = config.name ? (config.name[currentLanguage] || config.name.vi || config.name.en) : (game.name || 'Roblox Game');
+            const playingText = translations[currentLanguage]?.['games.playing'] || (currentLanguage === 'en' ? 'Playing' : 'Đang chơi');
+            const visitsText = translations[currentLanguage]?.['games.visits'] || (currentLanguage === 'en' ? 'Visits' : 'Lượt ghé');
+            return `
+                <a href="${game.url}" class="game-card" target="_blank" rel="noreferrer">
+                    <div class="game-thumbnail">
+                        <img src="${game.thumbnail}" alt="${displayName}">
+                    </div>
+                    <div class="game-name" style="text-decoration: none;">${displayName}</div>
+                    <div class="game-stats">
+                        <span><i class="fas fa-user-friends"></i> ${formatNumber(game.playing)} ${playingText}</span>
+                        <span><i class="fas fa-eye"></i> ${formatNumber(game.visits)} ${visitsText}</span>
+                    </div>
+                </a>
+            `;
+        };
+
+        const cards = loadedGames.map(createCard).join('');
+        gamesScroll.innerHTML = cards + cards;
+    }
+
+    async function loadSiteData() {
+        try {
+            const [faqRes, partnersRes, projectsRes] = await Promise.all([
+                fetch('data/faq.json'),
+                fetch('data/partners.json'),
+                fetch('data/projects.json')
+            ]);
+
+            if (faqRes.ok) {
+                faqData = await faqRes.json();
+                if (!Array.isArray(faqData)) faqData = [];
+            } else {
+                console.error('Cannot load FAQ (status ' + faqRes.status + ')');
+                faqData = [];
+            }
+
+            if (partnersRes.ok) {
+                partnersData = await partnersRes.json();
+                if (!Array.isArray(partnersData)) partnersData = [];
+            } else {
+                console.error('Cannot load partners (status ' + partnersRes.status + ')');
+                partnersData = [];
+            }
+
+            if (projectsRes.ok) {
+                robloxGames = await projectsRes.json();
+                if (!Array.isArray(robloxGames)) robloxGames = [];
+            } else {
+                console.error('Cannot load projects (status ' + projectsRes.status + ')');
+                robloxGames = [];
+            }
+        } catch (error) {
+            console.error('Error loading site data:', error);
+            console.warn('⚠️ CORS Error: Nếu bạn đang mở file trực tiếp (file://), vui lòng chạy local server:');
+            console.warn('   - Python: python -m http.server 8000');
+            console.warn('   - Node.js: npx http-server');
+            console.warn('   - VS Code: Cài extension "Live Server" và click "Go Live"');
+            faqData = [];
+            partnersData = [];
+            robloxGames = [];
+            
+            // Show user-friendly message
+            if (window.location.protocol === 'file:') {
+                const warningDiv = document.createElement('div');
+                warningDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(196,30,58,0.95);color:#fff;padding:2rem;border-radius:1rem;z-index:10000;max-width:500px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.3);';
+                warningDiv.innerHTML = '<h3 style="margin-bottom:1rem;">⚠️ Lỗi CORS</h3><p style="margin-bottom:1rem;">Vui lòng chạy website qua local server để load dữ liệu:</p><p style="font-size:0.9rem;margin-bottom:1rem;">• Python: <code>python -m http.server 8000</code></p><p style="font-size:0.9rem;margin-bottom:1rem;">• VS Code: Cài "Live Server" extension</p><button onclick="this.parentElement.remove()" style="padding:0.5rem 1.5rem;background:#fff;color:#c41e3a;border:none;border-radius:0.5rem;cursor:pointer;font-weight:600;">Đóng</button>';
+                document.body.appendChild(warningDiv);
+            }
+        }
+    }
+    // Open selection modal
+    function openSelectionModal() {
+        selectionModal.classList.add('modal-active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Close selection modal
+    function closeSelectionModal() {
+        selectionModal.classList.remove('modal-active');
+        document.body.style.overflow = '';
+    }
+
+    // Open registration modal
+    function openRegistrationModal() {
+        closeSelectionModal();
+        registrationModal.classList.add('modal-active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Close registration modal
+    function closeRegistrationModal() {
+        registrationModal.classList.remove('modal-active');
+        document.body.style.overflow = '';
+    }
+
+    // Register link click - open selection modal
+    registerLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        openSelectionModal();
+    });
+
+    // Hero register link
+    document.getElementById('hero-register-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        openSelectionModal();
+    });
+
+    // Selection modal close
+    selectionModalClose.addEventListener('click', closeSelectionModal);
+    selectionModal.addEventListener('click', function(e) {
+        if (e.target === selectionModal) {
+            closeSelectionModal();
+        }
+    });
+
+    // Facebook register button
+    facebookRegisterBtn.addEventListener('click', function() {
+        window.open(facebookLink, '_blank');
+        closeSelectionModal();
+    });
+
+    // Gmail register button
+    gmailRegisterBtn.addEventListener('click', function() {
+        openRegistrationModal();
+    });
+
+    // Close registration modal
+    modalClose.addEventListener('click', closeRegistrationModal);
+    registrationModal.addEventListener('click', function(e) {
+        if (e.target === registrationModal) {
+            closeRegistrationModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (registrationModal.classList.contains('modal-active')) {
+                closeRegistrationModal();
+            } else if (selectionModal.classList.contains('modal-active')) {
+                closeSelectionModal();
+            }
+        }
+    });
+
+    // Update price when course changes
+    courseSelect.addEventListener('change', function() {
+        updatePrice();
+    });
+
+    // Apply coupon
+    applyCouponBtn.addEventListener('click', function() {
+        const coupon = couponInput.value.trim();
+        if (coupon === validCoupon) {
+            currentDiscount = discountPercent;
+            couponMessage.textContent = translations[currentLanguage]?.['form.couponSuccess'] || '✓ Mã giảm giá hợp lệ! Bạn được giảm 10%.';
+            couponMessage.className = 'coupon-message coupon-success';
+            updatePrice();
+        } else if (coupon === '') {
+            currentDiscount = 0;
+            couponMessage.textContent = '';
+            couponMessage.className = 'coupon-message';
+            updatePrice();
+        } else {
+            currentDiscount = 0;
+            couponMessage.textContent = translations[currentLanguage]?.['form.couponInvalid'] || '✗ Mã giảm giá không hợp lệ.';
+            couponMessage.className = 'coupon-message coupon-error';
+            updatePrice();
+        }
+    });
+
+    // Update price calculation
+    function updatePrice() {
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+        const originalPrice = selectedOption && selectedOption.dataset.price ? parseInt(selectedOption.dataset.price, 10) : 0;
+        
+        const discountAmount = originalPrice * (currentDiscount / 100);
+        const finalPrice = originalPrice - discountAmount;
+
+        document.getElementById('original-price').textContent = formatCurrency(originalPrice);
+        
+        if (currentDiscount > 0) {
+            document.getElementById('discount-row').style.display = 'flex';
+            document.getElementById('discount-amount').textContent = '-' + formatCurrency(discountAmount);
+        } else {
+            document.getElementById('discount-row').style.display = 'none';
+        }
+        
+        document.getElementById('final-price').textContent = formatCurrency(finalPrice);
+    }
+
+    // Smooth scroll for anchor links (except register)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        if (anchor.id !== 'register-link') {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        }
+    });
+
+    // Form submission handler - Send email
+    document.getElementById('registration-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('contact-name').value;
+        const email = document.getElementById('contact-email').value;
+        const phone = document.getElementById('contact-phone').value;
+        const courseType = document.getElementById('course-type').value;
+        const coupon = document.getElementById('coupon-code').value;
+        const message = document.getElementById('contact-message').value;
+        
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+        const originalPrice = selectedOption && selectedOption.dataset.price ? parseInt(selectedOption.dataset.price, 10) : 0;
+        const discountAmount = originalPrice * (currentDiscount / 100);
+        const finalPrice = originalPrice - discountAmount;
+        
+        const emailTexts = currentLanguage === 'en'
+            ? {
+                subject: 'Lua Course Registration - ',
+                header: 'Course registration details:',
+                name: 'Full name',
+                email: 'Email',
+                phone: 'Phone number',
+                course: 'Course',
+                originalPrice: 'Original price',
+                coupon: 'Coupon',
+                discount: 'Discount',
+                total: 'Total',
+                notes: 'Notes',
+                none: '(None)'
+            }
+            : {
+                subject: 'Đăng Ký Khóa Học Lua - ',
+                header: 'Thông tin đăng ký khóa học:',
+                name: 'Họ và tên',
+                email: 'Email',
+                phone: 'Số điện thoại',
+                course: 'Loại khóa học',
+                originalPrice: 'Giá gốc',
+                coupon: 'Mã giảm giá',
+                discount: 'Giảm giá',
+                total: 'Tổng cộng',
+                notes: 'Lời nhắn',
+                none: '(Không có)'
+            };
+
+        const subject = encodeURIComponent(emailTexts.subject + name);
+        let bodyText = emailTexts.header + '\n\n';
+        bodyText += emailTexts.name + ': ' + name + '\n';
+        bodyText += emailTexts.email + ': ' + email + '\n';
+        bodyText += emailTexts.phone + ': ' + phone + '\n';
+        bodyText += emailTexts.course + ': ' + (selectedOption ? selectedOption.textContent : courseType) + '\n';
+        bodyText += emailTexts.originalPrice + ': ' + formatCurrency(originalPrice) + '\n';
+        if (currentDiscount > 0) {
+            bodyText += emailTexts.coupon + ': ' + coupon + ' (-' + currentDiscount + '%)\n';
+            bodyText += emailTexts.discount + ': ' + formatCurrency(discountAmount) + '\n';
+        }
+        bodyText += emailTexts.total + ': ' + formatCurrency(finalPrice) + '\n\n';
+        bodyText += emailTexts.notes + ':\n' + (message || emailTexts.none);
+        
+        const body = encodeURIComponent(bodyText);
+        
+        window.location.href = 'mailto:dgkktok@gmail.com?subject=' + subject + '&body=' + body;
+        
+        setTimeout(() => {
+            const successMessage = translations[currentLanguage]?.['form.submitSuccess'] || 'Cảm ơn bạn đã đăng ký! Email đã được mở. Nếu email không mở tự động, vui lòng gửi email đến dgkktok@gmail.com với thông tin trên.';
+            alert(successMessage);
+            closeRegistrationModal();
+            this.reset();
+            currentDiscount = 0;
+            couponInput.value = '';
+            couponMessage.textContent = '';
+            couponMessage.className = 'coupon-message';
+            updatePrice();
+        }, 500);
+    });
+    function wait(ms) {
+       return new Promise(resolve => setTimeout(resolve, ms));
+    }
+async function loadRobloxGame(gameConfig) {
+  const gameId = gameConfig.id;
+  const fallbackName = typeof gameConfig.name === 'object'
+    ? (gameConfig.name.vi || gameConfig.name.en)
+    : gameConfig.name;
+
+  const thumbnailUrl = `https://thumbnails.roproxy.com/v1/assets?assetIds=${gameId}&size=150x150&format=Png&isCircular=false&thumbnailType=AssetThumbnail`;
+
+  let realThumb = null;
+  let universeId = gameId;
+  let playing = null;
+  let visits = null;
+
+  // Load thumbnail
+  try {
+    const thumbRes = await fetch(thumbnailUrl);
+    const thumbData = await thumbRes.json();
+    realThumb = thumbData.data?.[0]?.imageUrl || null;
+  } catch (err) {
+    console.warn("Thumbnail fetch failed:", err);
+  }
+
+  await wait(300);
+
+  // Load universeId
+  try {
+    const placeData = `https://apis.roproxy.com/universes/v1/places/${gameId}/universe`;
+    const placeRes = await fetch(placeData);
+    const placeJson = await placeRes.json();
+    universeId = placeJson.universeId || gameId;
+  } catch (err) {
+    console.warn("Universe ID fetch failed:", err);
+  }
+
+  await wait(300);
+
+  // Retry loop for game stats
+  let attempts = 0;
+  const maxAttempts = 5;
+
+  while (attempts < maxAttempts && (playing === null || visits === null)) {
+    try {
+      const universeDataUrl = `https://games.roproxy.com/v1/games?universeIds=${universeId}`;
+      const universeRes = await fetch(universeDataUrl);
+      const universeJson = await universeRes.json();
+
+      playing = universeJson.data?.[0]?.playing ?? null;
+      visits = universeJson.data?.[0]?.visits ?? null;
+
+      if (playing !== null && visits !== null) break;
+    } catch (err) {
+      console.warn(`Attempt ${attempts + 1} failed:`, err);
+    }
+
+    attempts++;
+    await wait(500); // wait longer between retries
+  }
+
+  return {
+    id: gameId,
+    name: fallbackName,
+    thumbnail: realThumb,
+    playing: playing || 0,
+    visits: visits || 0,
+    url: `https://www.roblox.com/games/${gameId}/`
+  };
+}
+
+
+    async function loadGames() {
+        const gamesScroll = document.getElementById('games-scroll');
+        if (robloxGames.length === 0) {
+            const emptyText = translations[currentLanguage]?.['games.empty'] || 'Chưa có game nào. Vui lòng thêm game vào data/projects.json.';
+            gamesScroll.innerHTML = `<div class="game-placeholder">${emptyText}</div>`;
+            return;
+        }
+
+        const loadingText = translations[currentLanguage]?.['games.loading'] || 'Đang tải thông tin game...';
+        gamesScroll.innerHTML = `<div class="game-placeholder">${loadingText}</div>`;
+
+        const gamesData = [];
+        for (const game of robloxGames) {
+            const gameData = await loadRobloxGame(game);
+            if (gameData) {
+                gameData.config = game;
+                gamesData.push(gameData);
+            }
+        }
+
+        if (gamesData.length === 0) {
+            const failText = translations[currentLanguage]?.['games.fail'] || 'Không thể tải thông tin game. Vui lòng kiểm tra lại data/projects.json.';
+            gamesScroll.innerHTML = `<div class="game-placeholder">${failText}</div>`;
+            return;
+        }
+
+        loadedGames = gamesData;
+        renderGames();
+    }
+
+    function formatNumber(num) {
+        if (!num || num === 0) return '0';
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num.toString();
+    }
+setLanguage('vi');
+    // Initialize dynamic content on load
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadSiteData();
+        await loadGames();
+        renderPartners(); // Render partners after loading data
+       // detectLocale();
+        initializeFAQ();
+        updateCourseOptions();
+        updateDisplayedPrices();
+
+        const languageToggleBtn = document.getElementById('language-toggle');
+        if (languageToggleBtn) {
+            languageToggleBtn.addEventListener('click', () => {
+                setLanguage(currentLanguage === 'vi' ? 'en' : 'vi');
+            });
+        }
+    });
+
+    window.addEventListener('scroll', handleLanguagesAnimation);
+    window.addEventListener('DOMContentLoaded', handleLanguagesAnimation);
+    window.addEventListener('scroll', handleWhyAnimation);
+    window.addEventListener('DOMContentLoaded', handleWhyAnimation);
+    window.addEventListener('scroll', handlePricingAnimation);
+    window.addEventListener('DOMContentLoaded', handlePricingAnimation);
+    window.addEventListener('scroll', handleContactAnimation);
+    window.addEventListener('DOMContentLoaded', handleContactAnimation);
+    window.addEventListener('scroll', handleStatsGridAnimation);
+    window.addEventListener('DOMContentLoaded', handleStatsGridAnimation);
+
+    // Dark Mode Button Handler
+    const darkModeBtn = document.getElementById('dark-mode-btn');
+    const darkModePage = document.getElementById('dark-mode-page');
+    const darkModeClose = document.getElementById('dark-mode-close');
+
+    if (darkModeBtn) {
+        darkModeBtn.addEventListener('click', function() {
+            darkModePage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (darkModeClose) {
+        darkModeClose.addEventListener('click', function() {
+            darkModePage.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
+
+    if (darkModePage) {
+        darkModePage.addEventListener('click', function(e) {
+            if (e.target === darkModePage) {
+                darkModePage.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    }
+
+    // Close dark mode with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && darkModePage.classList.contains('active')) {
+            darkModePage.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+    </script>
