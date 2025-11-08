@@ -1936,14 +1936,29 @@
                     return;
                 }
                 
-                // Deduct balance from server
+                // Deduct balance from server (instant save to MongoDB)
                 const newBalance = currentBalance - total;
-                await updateBalanceOnServer(newBalance);
+                const balanceSaved = await updateBalanceOnServer(newBalance);
+                
+                if (!balanceSaved) {
+                    throw new Error('Failed to save balance to MongoDB');
+                }
                 
                 // Update local balance
                 userBalance = newBalance;
                 saveUserData();
                 updateBalanceDisplay();
+                
+                // Save transaction to MongoDB instantly
+                await saveTransactionToServer({
+                    id: 'TXN-' + Date.now(),
+                    type: 'purchase',
+                    amount: -total,
+                    status: 'completed',
+                    description: `Mua hàng - Mã đơn: ${orderCode}`,
+                    userEmail: currentUser.email,
+                    createdAt: new Date().toISOString()
+                });
                 
                 // Save order to allOrders for admin management
                 const orderData = {
@@ -3233,7 +3248,7 @@
                 const currentBalance = data.balance || 0;
                 const newBalance = currentBalance + amount;
                 
-                // Update balance on server
+                // Update balance on server (instant save to MongoDB)
                 const updateResponse = await fetch(`${API_BASE_URL}/users?action=balance&email=${emailEncoded}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -3244,6 +3259,17 @@
                     throw new Error('Failed to update balance');
                 }
                 
+                // Save transaction to MongoDB instantly
+                await saveTransactionToServer({
+                    id: 'TXN-' + Date.now(),
+                    type: 'admin_add',
+                    amount: amount,
+                    status: 'completed',
+                    description: `Admin thêm tiền: ${formatCurrency(amount)}`,
+                    userEmail: email,
+                    createdAt: new Date().toISOString()
+                });
+                
                 // Update local storage as backup
                 const userKey = `store_balance_${email}`;
                 localStorage.setItem(userKey, newBalance.toString());
@@ -3251,7 +3277,7 @@
                 // Update current user balance if it's them
                 if (currentUser && currentUser.email === email) {
                     userBalance = newBalance;
-                    document.getElementById('user-balance').textContent = formatCurrency(userBalance);
+                    updateBalanceDisplay();
                     saveUserData();
                 }
                 
@@ -3300,7 +3326,47 @@
             // Sort by date (newest first)
             const sortedTransactions = [...userTransactions].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             
-            historyList.innerHTML = sortedTransactions.map(transaction => {
+            // Also load from server
+            try {
+                const email = encodeURIComponent(currentUser.email);
+                const serverResponse = await fetch(`${API_BASE_URL}/transactions?userEmail=${email}`);
+                if (serverResponse.ok) {
+                    const serverData = await serverResponse.json();
+                    const serverTransactions = serverData.transactions || [];
+                    
+                    // Merge server transactions with local ones
+                    const allTransactions = [...userTransactions];
+                    serverTransactions.forEach(serverTxn => {
+                        if (!allTransactions.find(t => t.id === serverTxn.id)) {
+                            allTransactions.push(serverTxn);
+                        }
+                    });
+                    
+                    // Update sorted transactions
+                    const sortedTransactions = [...allTransactions].sort((a, b) => {
+                        const dateA = new Date(a.createdAt || a.createdAt);
+                        const dateB = new Date(b.createdAt || b.createdAt);
+                        return dateB - dateA;
+                    });
+                    
+                    renderTransactionItems(sortedTransactions, historyList);
+                    return;
+                }
+            } catch (error) {
+                console.error('Error loading transactions from server:', error);
+            }
+            
+            // Fallback to local only
+            renderTransactionItems(sortedTransactions, historyList);
+        }
+        
+        function renderTransactionItems(transactions, container) {
+            if (transactions.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: #999;"><i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i><p>Chưa có giao dịch nào</p></div>';
+                return;
+            }
+            
+            container.innerHTML = transactions.map(transaction => {
                 const statusClass = {
                     'pending': 'transaction-status-pending',
                     'completed': 'transaction-status-completed',
@@ -3313,20 +3379,60 @@
                     'cancelled': 'Đã hủy'
                 }[transaction.status] || transaction.status;
                 
+                const statusIcon = {
+                    'pending': 'fas fa-clock',
+                    'completed': 'fas fa-check-circle',
+                    'cancelled': 'fas fa-times-circle'
+                }[transaction.status] || 'fas fa-info-circle';
+                
+                const typeIcon = {
+                    'topup': 'fas fa-wallet',
+                    'purchase': 'fas fa-shopping-cart',
+                    'admin_add': 'fas fa-user-shield',
+                    'subscription': 'fas fa-sync-alt',
+                    'marketplace_fee': 'fas fa-tag'
+                }[transaction.type] || 'fas fa-exchange-alt';
+                
+                const amount = Math.abs(transaction.amount || 0);
+                const isPositive = (transaction.amount || 0) > 0;
+                const amountColor = isPositive ? '#4caf50' : '#f44336';
+                const amountSign = isPositive ? '+' : '-';
+                
+                const date = new Date(transaction.createdAt);
+                const dateStr = date.toLocaleDateString('vi-VN', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric' 
+                });
+                const timeStr = date.toLocaleTimeString('vi-VN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+                
                 return `
-                    <div class="transaction-item">
-                        <div class="transaction-header">
-                            <div>
-                                <strong>${transaction.description}</strong>
-                                <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
-                                    ${new Date(transaction.createdAt).toLocaleString('vi-VN')}
+                    <div class="transaction-item-modern">
+                        <div class="transaction-icon-wrapper">
+                            <i class="${typeIcon}"></i>
+                        </div>
+                        <div class="transaction-content">
+                            <div class="transaction-main-info">
+                                <div class="transaction-description">
+                                    <strong>${transaction.description || 'Giao dịch'}</strong>
+                                    <div class="transaction-meta">
+                                        <i class="fas fa-calendar-alt"></i> ${dateStr}
+                                        <span style="margin: 0 0.5rem;">•</span>
+                                        <i class="fas fa-clock"></i> ${timeStr}
+                                    </div>
                                 </div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 1.2rem; font-weight: 600; color: #4caf50;">
-                                    +${formatCurrency(transaction.amount)}
+                                <div class="transaction-amount-wrapper">
+                                    <div class="transaction-amount" style="color: ${amountColor};">
+                                        ${amountSign}${formatCurrency(amount)}
+                                    </div>
+                                    <span class="transaction-status-modern ${statusClass}">
+                                        <i class="${statusIcon}"></i> ${statusText}
+                                    </span>
                                 </div>
-                                <span class="transaction-status ${statusClass}">${statusText}</span>
                             </div>
                         </div>
                     </div>
