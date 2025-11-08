@@ -376,7 +376,8 @@
         const ROBUX_STOCK = 10000; // 10k Robux available
         
         // MongoDB API endpoint (Vercel serverless function)
-        const API_BASE_URL = 'https://your-vercel-app.vercel.app/api'; // Replace with your Vercel API URL
+        // API Base URL - use relative path for same domain
+        const API_BASE_URL = '/api'; // Vercel API routes
         
         const products = [
             {
@@ -453,19 +454,29 @@
         };
         
         // Admin configuration
-        const ADMIN_EMAIL = 'dggktok@gmail.com'; // Admin email - only this user can access admin panel
+        const ADMIN_EMAIL = 'dgkktok@gmail.com'; // Admin email - only this user can access admin panel
         
         // Store orders for admin management
         let allOrders = JSON.parse(localStorage.getItem('store_orders') || '[]');
         
         // Check if current user is admin
         function isAdmin() {
-            if (!currentUser) return false;
+            if (!currentUser || !currentUser.email) {
+                console.log('isAdmin: No current user or email');
+                return false;
+            }
+            
+            const userEmail = currentUser.email.toLowerCase().trim();
+            const adminEmail = ADMIN_EMAIL.toLowerCase().trim();
+            
+            console.log('isAdmin check:', {
+                userEmail: userEmail,
+                adminEmail: adminEmail,
+                match: userEmail === adminEmail
+            });
+            
             // Check both exact match and case-insensitive
-            return currentUser.email && (
-                currentUser.email === ADMIN_EMAIL || 
-                currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()
-            );
+            return userEmail === adminEmail;
         }
         
         // Check if user has pending transaction
@@ -1335,6 +1346,26 @@
             if (currentUser) {
                 localStorage.setItem('store_user', JSON.stringify(currentUser));
                 localStorage.setItem('store_balance', userBalance.toString());
+                
+                // Also save to MongoDB
+                saveUserToDB({
+                    email: currentUser.email,
+                    name: currentUser.name,
+                    balance: userBalance
+                });
+            }
+        }
+        
+        // Save user to MongoDB
+        async function saveUserToDB(userData) {
+            try {
+                await fetch(`${API_BASE_URL}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+            } catch (error) {
+                console.error('Failed to save user to DB:', error);
             }
         }
         
@@ -1353,7 +1384,20 @@
             
             // Show admin button if user is admin
             if (adminBtn) {
-                adminBtn.style.display = isAdmin() ? 'block' : 'none';
+                const adminStatus = isAdmin();
+                console.log('showUserMenu - Admin status:', adminStatus, 'Current user:', currentUser);
+                
+                if (adminStatus) {
+                    adminBtn.style.display = 'block';
+                    adminBtn.removeAttribute('style'); // Remove inline style
+                    adminBtn.style.display = 'block'; // Set to block
+                    console.log('✅ Admin panel button is now visible');
+                } else {
+                    adminBtn.style.display = 'none';
+                    console.log('❌ User is not admin, hiding admin panel button');
+                }
+            } else {
+                console.error('Admin panel button not found in DOM!');
             }
         }
         
@@ -1712,6 +1756,28 @@
                 
                 saveUserData();
                 showUserMenu();
+                
+                // Force refresh admin panel visibility after login
+                setTimeout(() => {
+                    const adminBtn = document.getElementById('admin-panel-btn');
+                    if (adminBtn) {
+                        const adminStatus = isAdmin();
+                        console.log('Post-login admin check:', {
+                            isAdmin: adminStatus,
+                            userEmail: currentUser?.email,
+                            adminEmail: ADMIN_EMAIL
+                        });
+                        
+                        if (adminStatus) {
+                            adminBtn.removeAttribute('style');
+                            adminBtn.style.display = 'block';
+                            console.log('✅ Admin panel button is now visible after login');
+                        } else {
+                            adminBtn.style.display = 'none';
+                        }
+                    }
+                }, 200);
+                
                 document.getElementById('login-modal').style.display = 'none';
             } catch (error) {
                 // User is not logged in, show login button
@@ -1845,9 +1911,9 @@
             loadAdminOrders();
         }
         
-        function adminAddMoney() {
+        async function adminAddMoney() {
             if (!isAdmin()) {
-                alert('Bạn không có quyền!');
+                showNotification('Lỗi', 'Bạn không có quyền!', 'error');
                 return;
             }
             
@@ -1855,27 +1921,52 @@
             const amount = parseFloat(document.getElementById('admin-amount').value);
             
             if (!email || !amount || amount <= 0) {
-                alert('Vui lòng nhập đầy đủ thông tin!');
+                showNotification('Lỗi', 'Vui lòng nhập đầy đủ thông tin hợp lệ!', 'error');
                 return;
             }
             
-            // Get user balance from localStorage (in real app, this would be from database)
-            const userKey = `store_balance_${email}`;
-            const currentBalance = parseFloat(localStorage.getItem(userKey) || '0');
-            const newBalance = currentBalance + amount;
-            
-            localStorage.setItem(userKey, newBalance.toString());
-            
-            // If this is the current user, update their balance
-            if (currentUser && currentUser.email === email) {
-                userBalance = newBalance;
-                document.getElementById('user-balance').textContent = formatCurrency(userBalance);
-                saveUserData();
+            try {
+                // Get current balance from server
+                const response = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(email)}/balance`);
+                const data = await response.ok ? await response.json() : { balance: 0 };
+                const currentBalance = data.balance || 0;
+                const newBalance = currentBalance + amount;
+                
+                // Update balance on server
+                const updateResponse = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(email)}/balance`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ balance: newBalance })
+                });
+                
+                if (!updateResponse.ok) {
+                    throw new Error('Failed to update balance');
+                }
+                
+                // Update local storage as backup
+                const userKey = `store_balance_${email}`;
+                localStorage.setItem(userKey, newBalance.toString());
+                
+                // Update current user balance if it's them
+                if (currentUser && currentUser.email === email) {
+                    userBalance = newBalance;
+                    document.getElementById('user-balance').textContent = formatCurrency(userBalance);
+                    saveUserData();
+                }
+                
+                showNotification(
+                    'Thành công',
+                    `Đã thêm ${formatCurrency(amount)} cho ${email}\nSố dư mới: ${formatCurrency(newBalance)}`,
+                    'success',
+                    { timeout: 3000 }
+                );
+                
+                document.getElementById('admin-user-email').value = '';
+                document.getElementById('admin-amount').value = '';
+            } catch (error) {
+                console.error('Error adding money:', error);
+                showNotification('Lỗi', 'Không thể thêm tiền. Vui lòng thử lại!', 'error');
             }
-            
-            alert(`Đã thêm ${formatCurrency(amount)} cho ${email}\nSố dư mới: ${formatCurrency(newBalance)}`);
-            document.getElementById('admin-user-email').value = '';
-            document.getElementById('admin-amount').value = '';
         }
         
         // Transaction History Functions
@@ -2038,69 +2129,129 @@
             }).join('');
         }
         
-        function adminCompleteTransaction(transactionId, userEmail) {
+        async function adminCompleteTransaction(transactionId, userEmail) {
             if (!isAdmin()) {
-                alert('Bạn không có quyền!');
+                showNotification('Lỗi', 'Bạn không có quyền!', 'error');
                 return;
             }
             
-            if (!confirm('Xác nhận giao dịch này?')) {
-                return;
-            }
-            
-            const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${userEmail}`) || '[]');
-            const transaction = userTransactions.find(t => t.id === transactionId);
-            
-            if (!transaction) {
-                alert('Không tìm thấy giao dịch!');
-                return;
-            }
-            
-            transaction.status = 'completed';
-            transaction.completedAt = new Date().toISOString();
-            localStorage.setItem(`store_transactions_${userEmail}`, JSON.stringify(userTransactions));
-            
-            // Add money to user balance
-            const userKey = `store_balance_${userEmail}`;
-            const currentBalance = parseFloat(localStorage.getItem(userKey) || '0');
-            const newBalance = currentBalance + transaction.amount;
-            localStorage.setItem(userKey, newBalance.toString());
-            
-            // Update current user balance if it's them
-            if (currentUser && currentUser.email === userEmail) {
-                userBalance = newBalance;
-                document.getElementById('user-balance').textContent = formatCurrency(userBalance);
-                saveUserData();
-            }
-            
-            alert('Đã xác nhận giao dịch và cập nhật số dư!');
-            loadAdminTransactions();
+            showNotification(
+                'Xác nhận giao dịch',
+                `Bạn có chắc muốn xác nhận giao dịch này?`,
+                'warning',
+                {
+                    buttons: [
+                        { 
+                            text: 'Xác nhận', 
+                            onclick: `confirmCompleteTransaction('${transactionId}', '${userEmail}')`, 
+                            class: 'notification-btn-primary' 
+                        },
+                        { text: 'Hủy', onclick: 'closeNotification()', class: '' }
+                    ]
+                }
+            );
         }
         
-        function adminCancelTransaction(transactionId, userEmail) {
+        async function confirmCompleteTransaction(transactionId, userEmail) {
+            try {
+                // Get transaction from local storage first to get amount
+                const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${userEmail}`) || '[]');
+                const transaction = userTransactions.find(t => t.id === transactionId);
+                
+                if (!transaction) {
+                    showNotification('Lỗi', 'Không tìm thấy giao dịch!', 'error');
+                    return;
+                }
+                
+                // Update transaction status on server
+                const response = await fetch(`${API_BASE_URL}/transactions/${transactionId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: 'completed',
+                        userEmail: userEmail
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to update transaction');
+                }
+                
+                // Update local storage
+                transaction.status = 'completed';
+                transaction.completedAt = new Date().toISOString();
+                localStorage.setItem(`store_transactions_${userEmail}`, JSON.stringify(userTransactions));
+                
+                // Update current user balance if it's them
+                if (currentUser && currentUser.email === userEmail) {
+                    await getCurrentBalance(); // Refresh balance from server
+                }
+                
+                closeNotification();
+                showNotification('Thành công', 'Đã xác nhận giao dịch và cập nhật số dư!', 'success', { timeout: 2000 });
+                loadAdminTransactions();
+            } catch (error) {
+                console.error('Error completing transaction:', error);
+                showNotification('Lỗi', 'Không thể xác nhận giao dịch. Vui lòng thử lại!', 'error');
+            }
+        }
+        
+        async function adminCancelTransaction(transactionId, userEmail) {
             if (!isAdmin()) {
-                alert('Bạn không có quyền!');
+                showNotification('Lỗi', 'Bạn không có quyền!', 'error');
                 return;
             }
             
-            if (!confirm('Hủy giao dịch này?')) {
-                return;
+            showNotification(
+                'Hủy giao dịch',
+                `Bạn có chắc muốn hủy giao dịch này?`,
+                'warning',
+                {
+                    buttons: [
+                        { 
+                            text: 'Xác nhận hủy', 
+                            onclick: `confirmCancelTransaction('${transactionId}', '${userEmail}')`, 
+                            class: 'notification-btn-danger' 
+                        },
+                        { text: 'Đóng', onclick: 'closeNotification()', class: '' }
+                    ]
+                }
+            );
+        }
+        
+        async function confirmCancelTransaction(transactionId, userEmail) {
+            try {
+                // Update transaction status on server
+                const response = await fetch(`${API_BASE_URL}/transactions/${transactionId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: 'cancelled',
+                        userEmail: userEmail
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to cancel transaction');
+                }
+                
+                // Update local storage
+                const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${userEmail}`) || '[]');
+                const transaction = userTransactions.find(t => t.id === transactionId);
+                
+                if (transaction) {
+                    transaction.status = 'cancelled';
+                    transaction.cancelledAt = new Date().toISOString();
+                    localStorage.setItem(`store_transactions_${userEmail}`, JSON.stringify(userTransactions));
+                }
+                
+                closeNotification();
+                showNotification('Thành công', 'Đã hủy giao dịch!', 'success', { timeout: 2000 });
+                loadAdminTransactions();
+            } catch (error) {
+                console.error('Error cancelling transaction:', error);
+                showNotification('Lỗi', 'Không thể hủy giao dịch. Vui lòng thử lại!', 'error');
             }
-            
-            const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${userEmail}`) || '[]');
-            const transaction = userTransactions.find(t => t.id === transactionId);
-            
-            if (!transaction) {
-                alert('Không tìm thấy giao dịch!');
-                return;
-            }
-            
-            transaction.status = 'cancelled';
-            transaction.cancelledAt = new Date().toISOString();
-            localStorage.setItem(`store_transactions_${userEmail}`, JSON.stringify(userTransactions));
-            
-            alert('Đã hủy giao dịch!');
-            loadAdminTransactions();
         }
         
         // User menu toggle
