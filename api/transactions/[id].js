@@ -5,39 +5,9 @@ const uri = process.env.STORAGE_URL || process.env.MONGODB_URI || 'mongodb+srv:/
 const client = new MongoClient(uri);
 
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        try {
-            await client.connect();
-            const db = client.db('store_db');
-            const transactionsCollection = db.collection('transactions');
-            
-            const transaction = {
-                ...req.body,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            };
-            
-            const result = await transactionsCollection.insertOne(transaction);
-            
-            res.status(200).json({ 
-                success: true, 
-                transactionId: result.insertedId,
-                transaction: transaction
-            });
-        } catch (error) {
-            console.error('Error saving transaction:', error);
-            res.status(500).json({ error: 'Failed to save transaction' });
-        } finally {
-            await client.close();
-        }
-    } else if (req.method === 'PUT') {
-        // Handle transaction update by ID
-        const { id } = req.query;
-        
-        if (!id) {
-            return res.status(400).json({ error: 'Transaction ID is required' });
-        }
-        
+    const { id } = req.query;
+    
+    if (req.method === 'PUT') {
         try {
             await client.connect();
             const db = client.db('store_db');
@@ -86,33 +56,8 @@ export default async function handler(req, res) {
         } finally {
             await client.close();
         }
-    } else if (req.method === 'GET') {
-        try {
-            await client.connect();
-            const db = client.db('store_db');
-            const transactionsCollection = db.collection('transactions');
-            
-            const { userEmail } = req.query;
-            
-            let query = {};
-            if (userEmail) {
-                query.userEmail = decodeURIComponent(userEmail);
-            }
-            
-            const transactions = await transactionsCollection
-                .find(query)
-                .sort({ createdAt: -1 })
-                .toArray();
-            
-            res.status(200).json({ transactions: transactions });
-        } catch (error) {
-            console.error('Error getting transactions:', error);
-            res.status(500).json({ error: 'Failed to get transactions' });
-        } finally {
-            await client.close();
-        }
     } else {
-        res.setHeader('Allow', ['POST', 'GET', 'PUT']);
+        res.setHeader('Allow', ['PUT']);
         res.status(405).json({ error: 'Method not allowed' });
     }
 }
