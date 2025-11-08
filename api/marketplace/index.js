@@ -18,7 +18,7 @@ export default async function handler(req, res) {
             const db = client.db('store_db');
             const marketplaceCollection = db.collection('marketplace');
             
-            const { sellerEmail, category, verified, pending, page = 1, limit = 12 } = req.query;
+            const { sellerEmail, category, verified, pending, page = 1, limit = 12, search } = req.query;
             
             let query = {};
             
@@ -41,6 +41,14 @@ export default async function handler(req, res) {
             } else {
                 // Default: only show verified items to non-admins
                 query.verified = true;
+            }
+            
+            // Search by name or description
+            if (search && search.trim()) {
+                query.$or = [
+                    { name: { $regex: search.trim(), $options: 'i' } },
+                    { description: { $regex: search.trim(), $options: 'i' } }
+                ];
             }
             
             // Auto-delete items older than 72 hours (only for verified items in browse view)

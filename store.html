@@ -604,6 +604,15 @@
                     
                     <!-- Browse Tab -->
                     <div class="marketplace-tab-content active" id="marketplace-browse-tab">
+                        <div class="marketplace-search-container" style="margin-bottom: 2rem;">
+                            <div class="marketplace-search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="marketplace-search-input" placeholder="Tìm kiếm sản phẩm..." onkeyup="handleMarketplaceSearch(event)">
+                                <button class="marketplace-search-clear" id="marketplace-search-clear" onclick="clearMarketplaceSearch()" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
                         <div class="marketplace-items-grid" id="marketplace-items-grid">
                             <!-- Items will be loaded here -->
                         </div>
@@ -618,6 +627,15 @@
                             <div class="input-group">
                                 <label>Tên sản phẩm:</label>
                                 <input type="text" id="sell-item-name" placeholder="Nhập tên sản phẩm" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Loại sản phẩm: <span style="color: #f44336;">*</span></label>
+                                <select id="sell-item-category" required style="width: 100%; padding: 1rem 1.25rem; border: 2px solid rgba(76, 175, 80, 0.2); border-radius: 0.75rem; font-size: 1rem; font-family: inherit; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.9); box-sizing: border-box; cursor: pointer;">
+                                    <option value="">-- Chọn loại sản phẩm --</option>
+                                    <option value="robux">Robux</option>
+                                    <option value="item">Item</option>
+                                    <option value="other">Khác</option>
+                                </select>
                             </div>
                             <div class="input-group">
                                 <label>Mô tả:</label>
@@ -3517,7 +3535,7 @@
                 const modal = document.getElementById('marketplace-modal');
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
-                loadMarketplaceItems();
+                loadMarketplaceItems(1, 'all');
             });
         }
         
@@ -3529,21 +3547,67 @@
         
         let currentMarketplacePage = 1;
         let marketplacePagination = null;
+        let currentMarketplaceCategory = 'all';
+        let currentMarketplaceSearch = '';
         
-        async function loadMarketplaceItems(page = 1) {
+        async function loadMarketplaceItems(page = 1, category = 'all', search = '') {
             try {
                 currentMarketplacePage = page;
-                const response = await fetch(`${API_BASE_URL}/marketplace?page=${page}&limit=12`);
+                currentMarketplaceCategory = category;
+                currentMarketplaceSearch = search;
+                const categoryParam = category === 'all' ? '' : `&category=${category}`;
+                const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+                const response = await fetch(`${API_BASE_URL}/marketplace?page=${page}&limit=12${categoryParam}${searchParam}`);
                 if (response.ok) {
                     const data = await response.json();
                     const items = data.items || [];
                     marketplacePagination = data.pagination;
                     renderMarketplaceItems(items);
-                    renderPagination('marketplace-pagination', marketplacePagination, loadMarketplaceItems);
+                    renderPagination('marketplace-pagination', marketplacePagination, (p) => loadMarketplaceItems(p, category, search));
                 }
             } catch (error) {
                 console.error('Error loading marketplace items:', error);
             }
+        }
+        
+        function handleMarketplaceSearch(event) {
+            const searchInput = document.getElementById('marketplace-search-input');
+            const searchClear = document.getElementById('marketplace-search-clear');
+            const searchTerm = searchInput.value.trim();
+            
+            // Show/hide clear button
+            if (searchTerm) {
+                searchClear.style.display = 'flex';
+            } else {
+                searchClear.style.display = 'none';
+            }
+            
+            // Debounce search - wait 500ms after user stops typing
+            clearTimeout(window.marketplaceSearchTimeout);
+            window.marketplaceSearchTimeout = setTimeout(() => {
+                loadMarketplaceItems(1, currentMarketplaceCategory, searchTerm);
+            }, 500);
+        }
+        
+        function clearMarketplaceSearch() {
+            const searchInput = document.getElementById('marketplace-search-input');
+            const searchClear = document.getElementById('marketplace-search-clear');
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            loadMarketplaceItems(1, currentMarketplaceCategory, '');
+        }
+        
+        function filterMarketplaceByCategory(category) {
+            // Update active button
+            document.querySelectorAll('.marketplace-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.marketplace-category-btn[data-category="${category}"]`).classList.add('active');
+            
+            // Reload items with new category (keep current search)
+            const searchInput = document.getElementById('marketplace-search-input');
+            const searchTerm = searchInput ? searchInput.value.trim() : '';
+            loadMarketplaceItems(1, category, searchTerm);
         }
         
         function renderMarketplaceItems(items, targetGrid = null) {
@@ -3670,6 +3734,7 @@
         async function submitItemWithImage(image) {
             const name = document.getElementById('sell-item-name').value.trim();
             const description = document.getElementById('sell-item-description').value.trim();
+            const category = document.getElementById('sell-item-category').value;
             const price = parseFloat(document.getElementById('sell-item-price').value);
             const quantity = parseInt(document.getElementById('sell-item-quantity').value);
             const phone = document.getElementById('sell-item-phone').value.trim();
@@ -3677,6 +3742,11 @@
             
             if (!name || !price || price < 1000 || !quantity || quantity < 1) {
                 showNotification('Lỗi', 'Vui lòng điền đầy đủ thông tin hợp lệ!', 'error');
+                return;
+            }
+            
+            if (!category || category === '') {
+                showNotification('Lỗi', 'Vui lòng chọn loại sản phẩm!', 'error');
                 return;
             }
             
@@ -3688,6 +3758,7 @@
                         sellerEmail: currentUser.email,
                         name: name,
                         description: description,
+                        category: category,
                         image: image,
                         price: price,
                         quantity: quantity,
