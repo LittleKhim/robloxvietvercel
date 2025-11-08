@@ -5,45 +5,16 @@ const uri = process.env.STORAGE_URL || process.env.MONGODB_URI || 'mongodb+srv:/
 const client = new MongoClient(uri);
 
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        try {
-            await client.connect();
-            const db = client.db('store_db');
-            const transactionsCollection = db.collection('transactions');
-            
-            const transaction = {
-                ...req.body,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            };
-            
-            const result = await transactionsCollection.insertOne(transaction);
-            
-            res.status(200).json({ 
-                success: true, 
-                transactionId: result.insertedId,
-                transaction: transaction
-            });
-        } catch (error) {
-            console.error('Error saving transaction:', error);
-            res.status(500).json({ error: 'Failed to save transaction' });
-        } finally {
-            await client.close();
-        }
-    } else if (req.method === 'PUT') {
-        // Handle transaction update by ID
-        const { id } = req.query;
+    const { id } = req.query;
+    
+    try {
+        await client.connect();
+        const db = client.db('store_db');
+        const transactionsCollection = db.collection('transactions');
+        const usersCollection = db.collection('users');
         
-        if (!id) {
-            return res.status(400).json({ error: 'Transaction ID is required' });
-        }
-        
-        try {
-            await client.connect();
-            const db = client.db('store_db');
-            const transactionsCollection = db.collection('transactions');
-            const usersCollection = db.collection('users');
-            
+        // UPDATE TRANSACTION BY ID - PUT /api/transactions?id=...
+        if (req.method === 'PUT' && id) {
             const { status, userEmail, amount } = req.body;
             
             if (!status || !['pending', 'completed', 'cancelled'].includes(status)) {
@@ -79,19 +50,28 @@ export default async function handler(req, res) {
                 }
             }
             
-            res.status(200).json({ success: true });
-        } catch (error) {
-            console.error('Error updating transaction:', error);
-            res.status(500).json({ error: 'Failed to update transaction' });
-        } finally {
-            await client.close();
+            return res.status(200).json({ success: true });
         }
-    } else if (req.method === 'GET') {
-        try {
-            await client.connect();
-            const db = client.db('store_db');
-            const transactionsCollection = db.collection('transactions');
+        
+        // CREATE TRANSACTION - POST /api/transactions
+        if (req.method === 'POST') {
+            const transaction = {
+                ...req.body,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
             
+            const result = await transactionsCollection.insertOne(transaction);
+            
+            return res.status(200).json({ 
+                success: true, 
+                transactionId: result.insertedId,
+                transaction: transaction
+            });
+        }
+        
+        // GET TRANSACTIONS - GET /api/transactions?userEmail=...
+        if (req.method === 'GET') {
             const { userEmail } = req.query;
             
             let query = {};
@@ -104,15 +84,17 @@ export default async function handler(req, res) {
                 .sort({ createdAt: -1 })
                 .toArray();
             
-            res.status(200).json({ transactions: transactions });
-        } catch (error) {
-            console.error('Error getting transactions:', error);
-            res.status(500).json({ error: 'Failed to get transactions' });
-        } finally {
-            await client.close();
+            return res.status(200).json({ transactions: transactions });
         }
-    } else {
+        
+        // Method not allowed
         res.setHeader('Allow', ['POST', 'GET', 'PUT']);
         res.status(405).json({ error: 'Method not allowed' });
+        
+    } catch (error) {
+        console.error('Transactions API error:', error);
+        res.status(500).json({ error: 'Failed to process request', details: error.message });
+    } finally {
+        await client.close();
     }
 }

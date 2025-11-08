@@ -1536,7 +1536,7 @@
             
             try {
                 const email = encodeURIComponent(currentUser.email);
-                const url = `${API_BASE_URL}/users/balance?email=${email}`;
+                const url = `${API_BASE_URL}/users?action=balance&email=${email}`;
                 console.log('Fetching balance from server:', url);
                 const response = await fetch(url);
                 
@@ -1602,7 +1602,7 @@
             
             try {
                 const email = encodeURIComponent(currentUser.email);
-                const url = `${API_BASE_URL}/users/balance?email=${email}`;
+                const url = `${API_BASE_URL}/users?action=balance&email=${email}`;
                 
                 console.log('Updating balance on server:', url, 'New balance:', newBalance);
                 
@@ -2260,7 +2260,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                const response = await fetch(`${API_BASE_URL}/auth?action=login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -2338,7 +2338,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                const response = await fetch(`${API_BASE_URL}/auth`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password, name })
@@ -2391,7 +2391,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+                const response = await fetch(`${API_BASE_URL}/auth?action=change-password`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2820,7 +2820,7 @@
                 // Load balance from server first, then fallback to localStorage
                 try {
                     const email = encodeURIComponent(user.email);
-                    const balanceResponse = await fetch(`${API_BASE_URL}/users/balance?email=${email}`);
+                    const balanceResponse = await fetch(`${API_BASE_URL}/users?action=balance&email=${email}`);
                     console.log('Balance API response status:', balanceResponse.status);
                     
                     if (balanceResponse.ok) {
@@ -3147,13 +3147,13 @@
             try {
                 // Get current balance from server
                 const emailEncoded = encodeURIComponent(email);
-                const response = await fetch(`${API_BASE_URL}/users/balance?email=${emailEncoded}`);
+                const response = await fetch(`${API_BASE_URL}/users?action=balance&email=${emailEncoded}`);
                 const data = await response.ok ? await response.json() : { balance: 0 };
                 const currentBalance = data.balance || 0;
                 const newBalance = currentBalance + amount;
                 
                 // Update balance on server
-                const updateResponse = await fetch(`${API_BASE_URL}/users/balance?email=${emailEncoded}`, {
+                const updateResponse = await fetch(`${API_BASE_URL}/users?action=balance&email=${emailEncoded}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ balance: newBalance })
@@ -3562,7 +3562,7 @@
             
             try {
                 // Get user balance
-                const balanceResponse = await fetch(`${API_BASE_URL}/users/balance?email=${encodeURIComponent(email)}`);
+                const balanceResponse = await fetch(`${API_BASE_URL}/users?action=balance&email=${encodeURIComponent(email)}`);
                 const balanceData = balanceResponse.ok ? await balanceResponse.json() : { balance: 0 };
                 
                 // Get transactions
@@ -3810,7 +3810,7 @@
         async function checkBlacklist(email) {
             try {
                 const emailEncoded = encodeURIComponent(email);
-                const response = await fetch(`${API_BASE_URL}/users/blacklist?email=${emailEncoded}`);
+                const response = await fetch(`${API_BASE_URL}/users?action=blacklist&email=${emailEncoded}`);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -3917,7 +3917,7 @@
             if (!isAdmin()) return;
             
             try {
-                const response = await fetch(`${API_BASE_URL}/users/blacklist?action=list`);
+                const response = await fetch(`${API_BASE_URL}/users?action=blacklist&list=true`);
                 if (response.ok) {
                     const data = await response.json();
                     const blacklist = data.blacklist || [];
@@ -4055,7 +4055,7 @@
                 }
                 
                 // Update transaction status on server
-                const response = await fetch(`${API_BASE_URL}/transactions/${transactionId}`, {
+                const response = await fetch(`${API_BASE_URL}/transactions?id=${transactionId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -4113,7 +4113,7 @@
         async function confirmCancelTransaction(transactionId, userEmail) {
             try {
                 // Update transaction status on server
-                const response = await fetch(`${API_BASE_URL}/transactions/${transactionId}`, {
+                const response = await fetch(`${API_BASE_URL}/transactions?id=${transactionId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
