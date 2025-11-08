@@ -242,6 +242,20 @@
             </div>
         </div>
 
+        <!-- Banned User Modal -->
+        <div class="banned-modal-overlay" id="banned-modal" style="display: none;">
+            <div class="banned-modal-container">
+                <div class="banned-modal-header">
+                    <i class="fas fa-ban"></i>
+                    <h2>Bạn đã bị cấm</h2>
+                </div>
+                <div class="banned-modal-content">
+                    <p>Bạn đã bị cấm sử dụng store vĩnh viễn</p>
+                    <button class="banned-logout-btn" onclick="handleLogout()">Đăng Xuất</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- Admin Panel Modal -->
         <div class="admin-modal-overlay" id="admin-modal" style="display: none;">
             <div class="admin-modal-container">
@@ -254,6 +268,7 @@
                         <button class="admin-tab active" data-tab="orders">Đơn Hàng</button>
                         <button class="admin-tab" data-tab="transactions">Giao Dịch Nạp Tiền</button>
                         <button class="admin-tab" data-tab="users">Quản Lý Tiền</button>
+                        <button class="admin-tab" data-tab="blacklist">Blacklist</button>
                     </div>
                     
                     <!-- Orders Tab -->
@@ -267,6 +282,25 @@
                     <div class="admin-tab-content" id="admin-transactions-tab">
                         <div class="admin-transactions-list" id="admin-transactions-list">
                             <!-- Transactions will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Blacklist Tab -->
+                    <div class="admin-tab-content" id="admin-blacklist-tab">
+                        <div class="admin-add-money">
+                            <h3>Quản Lý Blacklist</h3>
+                            <div class="input-group">
+                                <label>Email người dùng:</label>
+                                <input type="email" id="blacklist-email" placeholder="user@example.com">
+                            </div>
+                            <button class="admin-btn" onclick="adminAddToBlacklist()">Thêm vào Blacklist</button>
+                            <button class="admin-btn" style="background: #f44336; margin-top: 0.5rem;" onclick="adminRemoveFromBlacklist()">Gỡ khỏi Blacklist</button>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <h3 style="color: #333; margin-bottom: 1rem;">Danh sách Blacklist</h3>
+                            <div id="blacklist-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <!-- Blacklist items will be loaded here -->
+                            </div>
                         </div>
                     </div>
                     
@@ -785,15 +819,7 @@
                                     <div class="balance-value">${maxAffordable.toLocaleString()} Robux</div>
                                 </div>
                             </div>
-                        ` : `
-                            <div class="balance-item warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <div>
-                                    <div class="balance-label">Không đủ tiền</div>
-                                    <div class="balance-value">Vui lòng nạp thêm</div>
-                                </div>
-                            </div>
-                        `}
+                        ` : ''}
                     </div>
                     <div class="input-group">
                         <label>Số lượng Robux (1-${ROBUX_STOCK.toLocaleString()}):</label>
@@ -861,7 +887,7 @@
             }
         }
         
-        function confirmRobuxPurchase(currentBalance) {
+        async function confirmRobuxPurchase(currentBalance) {
             const input = document.getElementById('robux-quantity-input');
             if (!input) {
                 closeNotification();
@@ -871,11 +897,13 @@
             const quantity = parseInt(input.value) || 0;
             
             if (quantity <= 0) {
+                closeNotification();
                 showNotification('Lỗi', 'Vui lòng nhập số lượng hợp lệ!', 'error');
                 return;
             }
             
             if (quantity > ROBUX_STOCK) {
+                closeNotification();
                 showNotification(
                     'Lỗi',
                     `Số lượng vượt quá stock hiện có!\n\nStock còn lại: ${ROBUX_STOCK.toLocaleString()} Robux`,
@@ -886,15 +914,31 @@
             
             const price = quantity * ROBUX_RATE;
             
-            if (price > currentBalance) {
-                const shortage = price - currentBalance;
+            // Get latest balance from server before checking
+            let latestBalance = currentBalance;
+            try {
+                latestBalance = await getCurrentBalance();
+                console.log('Latest balance before purchase:', latestBalance);
+            } catch (error) {
+                console.error('Error getting latest balance:', error);
+            }
+            
+            if (price > latestBalance) {
+                const shortage = price - latestBalance;
+                closeNotification();
                 showNotification(
                     'Số tiền không đủ',
-                    `Số tiền hiện có: ${formatCurrency(currentBalance)}\n` +
+                    `Số tiền hiện có: ${formatCurrency(latestBalance)}\n` +
                     `Số tiền cần: ${formatCurrency(price)}\n` +
                     `Thiếu: ${formatCurrency(shortage)}\n\n` +
                     `Vui lòng nạp thêm tiền để tiếp tục.`,
-                    'error'
+                    'error',
+                    {
+                        buttons: [
+                            { text: 'Nạp tiền', onclick: 'closeNotification(); openTopUpModal();', class: 'notification-btn-primary' },
+                            { text: 'Đóng', onclick: 'closeNotification()', class: '' }
+                        ]
+                    }
                 );
                 return;
             }
@@ -917,8 +961,10 @@
             }
             
             try {
-                console.log('Fetching balance from server for:', currentUser.email);
-                const response = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(currentUser.email)}/balance`);
+                const email = encodeURIComponent(currentUser.email);
+                const url = `${API_BASE_URL}/users/balance?email=${email}`;
+                console.log('Fetching balance from server:', url);
+                const response = await fetch(url);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -952,14 +998,26 @@
         
         // Update balance on server
         async function updateBalanceOnServer(newBalance) {
-            if (!currentUser) return;
+            if (!currentUser || !currentUser.email) return;
             
             try {
-                await fetch(`${API_BASE_URL}/users/${encodeURIComponent(currentUser.email)}/balance`, {
+                const email = encodeURIComponent(currentUser.email);
+                const url = `${API_BASE_URL}/users/balance?email=${email}`;
+                
+                console.log('Updating balance on server:', url, 'New balance:', newBalance);
+                
+                const response = await fetch(url, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ balance: newBalance })
                 });
+                
+                if (response.ok) {
+                    console.log('✅ Balance updated successfully on server');
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Failed to update balance:', response.status, errorText);
+                }
             } catch (error) {
                 console.error('Error updating balance on server:', error);
             }
@@ -1802,9 +1860,18 @@
                     sub: user.$id
                 };
                 
+                // Check if user is blacklisted
+                const isBlacklisted = await checkBlacklist(user.email);
+                if (isBlacklisted) {
+                    console.log('❌ User is blacklisted:', user.email);
+                    showBannedModal();
+                    return;
+                }
+                
                 // Load balance from server first, then fallback to localStorage
                 try {
-                    const balanceResponse = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(user.email)}/balance`);
+                    const email = encodeURIComponent(user.email);
+                    const balanceResponse = await fetch(`${API_BASE_URL}/users/balance?email=${email}`);
                     if (balanceResponse.ok) {
                         const balanceData = await balanceResponse.json();
                         userBalance = balanceData.balance || 0;
@@ -2003,13 +2070,14 @@
             
             try {
                 // Get current balance from server
-                const response = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(email)}/balance`);
+                const emailEncoded = encodeURIComponent(email);
+                const response = await fetch(`${API_BASE_URL}/users/balance?email=${emailEncoded}`);
                 const data = await response.ok ? await response.json() : { balance: 0 };
                 const currentBalance = data.balance || 0;
                 const newBalance = currentBalance + amount;
                 
                 // Update balance on server
-                const updateResponse = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(email)}/balance`, {
+                const updateResponse = await fetch(`${API_BASE_URL}/users/balance?email=${emailEncoded}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ balance: newBalance })
@@ -2128,9 +2196,153 @@
                     // Load data for specific tab
                     if (tabName === 'transactions') {
                         loadAdminTransactions();
+                    } else if (tabName === 'blacklist') {
+                        loadBlacklist();
                     }
                 });
             });
+        }
+        
+        // Check if user is blacklisted
+        async function checkBlacklist(email) {
+            try {
+                const emailEncoded = encodeURIComponent(email);
+                const response = await fetch(`${API_BASE_URL}/users/blacklist?email=${emailEncoded}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.isBlacklisted || false;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error checking blacklist:', error);
+                return false;
+            }
+        }
+        
+        // Show banned modal
+        function showBannedModal() {
+            const bannedModal = document.getElementById('banned-modal');
+            if (bannedModal) {
+                bannedModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // Close banned modal
+        function closeBannedModal() {
+            const bannedModal = document.getElementById('banned-modal');
+            if (bannedModal) {
+                bannedModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Handle logout (for banned users)
+        function handleLogout() {
+            logout(); // Use existing logout function
+        }
+        
+        // Admin: Add to blacklist
+        async function adminAddToBlacklist() {
+            if (!isAdmin()) {
+                showNotification('Lỗi', 'Bạn không có quyền!', 'error');
+                return;
+            }
+            
+            const email = document.getElementById('blacklist-email').value.trim();
+            if (!email) {
+                showNotification('Lỗi', 'Vui lòng nhập email!', 'error');
+                return;
+            }
+            
+            try {
+                const emailEncoded = encodeURIComponent(email);
+                const response = await fetch(`${API_BASE_URL}/users/blacklist?email=${emailEncoded}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    showNotification('Thành công', `Đã thêm ${email} vào blacklist!`, 'success', { timeout: 2000 });
+                    document.getElementById('blacklist-email').value = '';
+                    loadBlacklist();
+                } else {
+                    throw new Error('Failed to add to blacklist');
+                }
+            } catch (error) {
+                console.error('Error adding to blacklist:', error);
+                showNotification('Lỗi', 'Không thể thêm vào blacklist. Vui lòng thử lại!', 'error');
+            }
+        }
+        
+        // Admin: Remove from blacklist
+        async function adminRemoveFromBlacklist() {
+            if (!isAdmin()) {
+                showNotification('Lỗi', 'Bạn không có quyền!', 'error');
+                return;
+            }
+            
+            const email = document.getElementById('blacklist-email').value.trim();
+            if (!email) {
+                showNotification('Lỗi', 'Vui lòng nhập email!', 'error');
+                return;
+            }
+            
+            try {
+                const emailEncoded = encodeURIComponent(email);
+                const response = await fetch(`${API_BASE_URL}/users/blacklist?email=${emailEncoded}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    showNotification('Thành công', `Đã gỡ ${email} khỏi blacklist!`, 'success', { timeout: 2000 });
+                    document.getElementById('blacklist-email').value = '';
+                    loadBlacklist();
+                } else {
+                    throw new Error('Failed to remove from blacklist');
+                }
+            } catch (error) {
+                console.error('Error removing from blacklist:', error);
+                showNotification('Lỗi', 'Không thể gỡ khỏi blacklist. Vui lòng thử lại!', 'error');
+            }
+        }
+        
+        // Load blacklist
+        async function loadBlacklist() {
+            if (!isAdmin()) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/blacklist-list`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const blacklist = data.blacklist || [];
+                    
+                    const blacklistList = document.getElementById('blacklist-list');
+                    if (!blacklistList) return;
+                    
+                    if (blacklist.length === 0) {
+                        blacklistList.innerHTML = '<p style="text-align: center; padding: 2rem; color: #666;">Chưa có người dùng nào bị blacklist</p>';
+                        return;
+                    }
+                    
+                    blacklistList.innerHTML = blacklist.map(user => `
+                        <div class="admin-order-item">
+                            <div class="admin-order-header">
+                                <div>
+                                    <strong>${user.email}</strong>
+                                    <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
+                                        Bị cấm: ${new Date(user.blacklistedAt).toLocaleString('vi-VN')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading blacklist:', error);
+            }
         }
         
         function loadAdminTransactions() {
