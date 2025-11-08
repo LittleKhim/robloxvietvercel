@@ -97,7 +97,9 @@
                     </button>
                 </div>
             </div>
-            <div id="google-signin-container" class="google-signin-container"></div>
+            <button id="login-btn" class="login-btn" onclick="openLoginModal()" style="display: none;">
+                <i class="fas fa-sign-in-alt"></i> <span class="login-btn-text">Đăng Nhập</span>
+            </button>
         </div>
     </nav>
 
@@ -204,9 +206,73 @@
         <div class="login-modal-overlay" id="login-modal">
             <div class="login-modal-container">
                 <div class="login-modal-content">
-                    <h2>Đăng Nhập Để Tiếp Tục</h2>
-                    <p>Vui lòng đăng nhập bằng Google để mua hàng</p>
-                    <div id="google-signin-modal"></div>
+                    <button class="login-modal-close" id="login-modal-close-btn">&times;</button>
+                    
+                    <!-- Login Form -->
+                    <div id="login-form-container" class="auth-form-container">
+                        <h2><i class="fas fa-sign-in-alt"></i> Đăng Nhập</h2>
+                        <p>Vui lòng đăng nhập để tiếp tục</p>
+                        
+                        <form id="login-form" class="auth-form">
+                            <div class="input-group">
+                                <label><i class="fas fa-envelope"></i> Email:</label>
+                                <input type="email" id="login-email" placeholder="Nhập email của bạn" required>
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-lock"></i> Mật khẩu:</label>
+                                <input type="password" id="login-password" placeholder="Nhập mật khẩu" required>
+                            </div>
+                            <button type="submit" class="auth-submit-btn">
+                                <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+                            </button>
+                        </form>
+                        
+                        <div class="auth-divider">
+                            <span>hoặc</span>
+                        </div>
+                        
+                        <div class="auth-footer">
+                            <p>Chưa có tài khoản? <a href="#" id="show-register-link">Đăng ký ngay</a></p>
+                            <div id="google-signin-modal" style="margin-top: 1rem;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Register Form -->
+                    <div id="register-form-container" class="auth-form-container" style="display: none;">
+                        <h2><i class="fas fa-user-plus"></i> Đăng Ký</h2>
+                        <p>Tạo tài khoản mới để bắt đầu mua sắm</p>
+                        
+                        <form id="register-form" class="auth-form">
+                            <div class="input-group">
+                                <label><i class="fas fa-user"></i> Tên hiển thị:</label>
+                                <input type="text" id="register-name" placeholder="Tên của bạn (tùy chọn)">
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-envelope"></i> Email:</label>
+                                <input type="email" id="register-email" placeholder="Nhập email của bạn" required>
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-lock"></i> Mật khẩu:</label>
+                                <input type="password" id="register-password" placeholder="Ít nhất 6 ký tự" required minlength="6">
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-lock"></i> Xác nhận mật khẩu:</label>
+                                <input type="password" id="register-confirm-password" placeholder="Nhập lại mật khẩu" required minlength="6">
+                            </div>
+                            <button type="submit" class="auth-submit-btn">
+                                <i class="fas fa-user-plus"></i> Đăng Ký
+                            </button>
+                        </form>
+                        
+                        <div class="auth-divider">
+                            <span>hoặc</span>
+                        </div>
+                        
+                        <div class="auth-footer">
+                            <p>Đã có tài khoản? <a href="#" id="show-login-link">Đăng nhập</a></p>
+                            <div id="google-signin-register-modal" style="margin-top: 1rem;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -599,6 +665,25 @@
                                 </div>
                                 <div id="roblox-account-status" style="margin-top: 0.5rem;"></div>
                             </div>
+                        </div>
+                        <div class="settings-section" style="margin-top: 2rem;">
+                            <h3>Đổi Mật Khẩu</h3>
+                            <div class="input-group">
+                                <label>Mật khẩu hiện tại:</label>
+                                <input type="password" id="current-password" placeholder="Nhập mật khẩu hiện tại">
+                            </div>
+                            <div class="input-group">
+                                <label>Mật khẩu mới:</label>
+                                <input type="password" id="new-password" placeholder="Ít nhất 6 ký tự" minlength="6">
+                            </div>
+                            <div class="input-group">
+                                <label>Xác nhận mật khẩu mới:</label>
+                                <input type="password" id="confirm-new-password" placeholder="Nhập lại mật khẩu mới" minlength="6">
+                            </div>
+                            <button class="settings-btn" onclick="changePassword()" style="width: 100%; margin-top: 0.5rem;">
+                                <i class="fas fa-key"></i> Đổi Mật Khẩu
+                            </button>
+                            <div id="password-change-status" style="margin-top: 0.5rem;"></div>
                         </div>
                         <div class="settings-section" style="margin-top: 2rem;">
                             <button class="settings-logout-btn" onclick="logout()">
@@ -2127,19 +2212,215 @@
         
         function showLoginButton() {
             const userMenuContainer = document.getElementById('user-menu-container');
-            const signinContainer = document.getElementById('google-signin-container');
+            const loginBtn = document.getElementById('login-btn');
             
             if (userMenuContainer) {
                 userMenuContainer.style.display = 'none';
                 userMenuContainer.style.visibility = 'hidden';
             }
-            if (signinContainer) {
-                signinContainer.style.display = 'flex'; // Use flex to match CSS
-                signinContainer.style.visibility = 'visible';
-                // Ensure button is rendered (only if not already rendered)
+            if (loginBtn) {
+                loginBtn.style.display = 'flex';
+                loginBtn.style.visibility = 'visible';
+            }
+        }
+        
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                // Show login form by default
+                document.getElementById('login-form-container').style.display = 'block';
+                document.getElementById('register-form-container').style.display = 'none';
+                // Initialize Google sign-in buttons
                 if (!buttonsRendered) {
                     initializeGoogleSignIn();
                 }
+            }
+        }
+        
+        function closeLoginModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Email/Password Login
+        async function handleEmailLogin(event) {
+            if (event) event.preventDefault();
+            
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showNotification('Lỗi', 'Vui lòng điền đầy đủ thông tin!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Set current user
+                    currentUser = {
+                        email: data.user.email,
+                        name: data.user.name,
+                        picture: '',
+                        sub: data.user.email,
+                        authMethod: 'email'
+                    };
+                    
+                    userBalance = data.user.balance || 0;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('store_user', JSON.stringify(currentUser));
+                    localStorage.setItem('store_balance', userBalance.toString());
+                    
+                    // Save to MongoDB
+                    saveUserData();
+                    
+                    // Log session
+                    logLoginSession({
+                        email: data.user.email,
+                        status: 'success',
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString()
+                    }).catch(e => console.error('Error logging session:', e));
+                    
+                    // Close modal and show user menu
+                    closeLoginModal();
+                    showUserMenu();
+                    
+                    showNotification('Thành công', 'Đăng nhập thành công!', 'success', { timeout: 2000 });
+                } else {
+                    if (data.useGoogle) {
+                        showNotification('Thông báo', 'Tài khoản này chỉ có thể đăng nhập bằng Google. Vui lòng sử dụng nút Google Sign-in bên dưới.', 'info');
+                    } else {
+                        showNotification('Lỗi', data.error || 'Đăng nhập thất bại!', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error logging in:', error);
+                showNotification('Lỗi', 'Không thể kết nối đến server. Vui lòng thử lại!', 'error');
+            }
+        }
+        
+        // Email/Password Register
+        async function handleEmailRegister(event) {
+            if (event) event.preventDefault();
+            
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            if (!email || !password) {
+                showNotification('Lỗi', 'Vui lòng điền đầy đủ thông tin!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự!', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('Lỗi', 'Mật khẩu xác nhận không khớp!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, name })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showNotification('Thành công', 'Đăng ký thành công! Đang đăng nhập...', 'success', { timeout: 2000 });
+                    
+                    // Auto login after register
+                    setTimeout(() => {
+                        document.getElementById('login-email').value = email;
+                        document.getElementById('login-password').value = password;
+                        handleEmailLogin();
+                    }, 500);
+                } else {
+                    showNotification('Lỗi', data.error || 'Đăng ký thất bại!', 'error');
+                }
+            } catch (error) {
+                console.error('Error registering:', error);
+                showNotification('Lỗi', 'Không thể kết nối đến server. Vui lòng thử lại!', 'error');
+            }
+        }
+        
+        // Change Password
+        async function changePassword() {
+            if (!currentUser || !currentUser.email) {
+                showNotification('Lỗi', 'Vui lòng đăng nhập trước!', 'error');
+                return;
+            }
+            
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-new-password').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showNotification('Lỗi', 'Vui lòng điền đầy đủ thông tin!', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showNotification('Lỗi', 'Mật khẩu mới phải có ít nhất 6 ký tự!', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('Lỗi', 'Mật khẩu xác nhận không khớp!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: currentUser.email,
+                        currentPassword,
+                        newPassword
+                    })
+                });
+                
+                const data = await response.json();
+                
+                const statusEl = document.getElementById('password-change-status');
+                
+                if (response.ok && data.success) {
+                    statusEl.innerHTML = '<span style="color: #4caf50;"><i class="fas fa-check-circle"></i> ' + data.message + '</span>';
+                    // Clear form
+                    document.getElementById('current-password').value = '';
+                    document.getElementById('new-password').value = '';
+                    document.getElementById('confirm-new-password').value = '';
+                    showNotification('Thành công', 'Đổi mật khẩu thành công!', 'success', { timeout: 2000 });
+                } else {
+                    statusEl.innerHTML = '<span style="color: #f44336;"><i class="fas fa-exclamation-circle"></i> ' + (data.error || 'Đổi mật khẩu thất bại!') + '</span>';
+                    showNotification('Lỗi', data.error || 'Đổi mật khẩu thất bại!', 'error');
+                }
+            } catch (error) {
+                console.error('Error changing password:', error);
+                const statusEl = document.getElementById('password-change-status');
+                statusEl.innerHTML = '<span style="color: #f44336;"><i class="fas fa-exclamation-circle"></i> Lỗi kết nối server!</span>';
+                showNotification('Lỗi', 'Không thể kết nối đến server. Vui lòng thử lại!', 'error');
             }
         }
         
@@ -2327,7 +2608,7 @@
         
         function checkLoginBeforeAction(callback) {
             if (!currentUser) {
-                document.getElementById('login-modal').style.display = 'flex';
+                openLoginModal();
                 return;
             }
             callback();
@@ -2336,8 +2617,8 @@
         function initializeGoogleSignIn() {
             // Render sign-in buttons only once
             if (!buttonsRendered) {
-                renderGoogleSignInButton('google-signin-container');
                 renderGoogleSignInButton('google-signin-modal');
+                renderGoogleSignInButton('google-signin-register-modal');
                 buttonsRendered = true;
             }
             
@@ -2371,9 +2652,12 @@
             // Clear existing content
             container.innerHTML = '';
             
-            // Create button
+            // Create button with smaller size for modal
             const button = document.createElement('button');
             button.className = 'google-signin-btn';
+            if (containerId === 'google-signin-modal' || containerId === 'google-signin-register-modal') {
+                button.className += ' google-signin-btn-modal';
+            }
             button.type = 'button'; // Prevent form submission
             button.innerHTML = `
                 <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
@@ -4361,9 +4645,48 @@
                 }
             });
             
+            // Login/Register form event listeners
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const loginModalClose = document.getElementById('login-modal-close-btn');
+            const showRegisterLink = document.getElementById('show-register-link');
+            const showLoginLink = document.getElementById('show-login-link');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleEmailLogin);
+            }
+            
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleEmailRegister);
+            }
+            
+            if (loginModalClose) {
+                loginModalClose.addEventListener('click', closeLoginModal);
+            }
+            
+            if (showRegisterLink) {
+                showRegisterLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('login-form-container').style.display = 'none';
+                    document.getElementById('register-form-container').style.display = 'block';
+                    // Initialize Google sign-in for register
+                    if (!buttonsRendered) {
+                        initializeGoogleSignIn();
+                    }
+                });
+            }
+            
+            if (showLoginLink) {
+                showLoginLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('register-form-container').style.display = 'none';
+                    document.getElementById('login-form-container').style.display = 'block';
+                });
+            }
+            
             document.getElementById('login-modal').addEventListener('click', function(e) {
                 if (e.target === this) {
-                    this.style.display = 'none';
+                    closeLoginModal();
                 }
             });
 
