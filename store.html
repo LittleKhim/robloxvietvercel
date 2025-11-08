@@ -83,6 +83,9 @@
                     <button class="user-dropdown-item" id="top-up-btn">
                         <i class="fas fa-wallet"></i> Nạp Tiền
                     </button>
+                    <button class="user-dropdown-item" id="transaction-history-btn">
+                        <i class="fas fa-history"></i> Lịch Sử Giao Dịch
+                    </button>
                     <button class="user-dropdown-item" id="settings-btn">
                         <i class="fas fa-cog"></i> Cài Đặt
                     </button>
@@ -208,6 +211,21 @@
             </div>
         </div>
 
+        <!-- Transaction History Modal -->
+        <div class="transaction-modal-overlay" id="transaction-modal" style="display: none;">
+            <div class="transaction-modal-container">
+                <div class="transaction-modal-header">
+                    <h2><i class="fas fa-history"></i> Lịch Sử Giao Dịch</h2>
+                    <button class="transaction-modal-close" id="transaction-modal-close">&times;</button>
+                </div>
+                <div class="transaction-modal-content">
+                    <div id="transaction-history-list">
+                        <!-- Transactions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin Panel Modal -->
         <div class="admin-modal-overlay" id="admin-modal" style="display: none;">
             <div class="admin-modal-container">
@@ -218,6 +236,7 @@
                 <div class="admin-modal-content">
                     <div class="admin-tabs">
                         <button class="admin-tab active" data-tab="orders">Đơn Hàng</button>
+                        <button class="admin-tab" data-tab="transactions">Giao Dịch Nạp Tiền</button>
                         <button class="admin-tab" data-tab="users">Quản Lý Tiền</button>
                     </div>
                     
@@ -225,6 +244,13 @@
                     <div class="admin-tab-content active" id="admin-orders-tab">
                         <div class="admin-orders-list" id="admin-orders-list">
                             <!-- Orders will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Transactions Tab -->
+                    <div class="admin-tab-content" id="admin-transactions-tab">
+                        <div class="admin-transactions-list" id="admin-transactions-list">
+                            <!-- Transactions will be loaded here -->
                         </div>
                     </div>
                     
@@ -411,7 +437,7 @@
         };
         
         // Admin configuration
-        const ADMIN_EMAIL = 'dggktok@gmail.com';
+        const ADMIN_EMAIL = 'dggktok@gmail.com'; // Admin email - only this user can access admin panel
         
         // Store orders for admin management
         let allOrders = JSON.parse(localStorage.getItem('store_orders') || '[]');
@@ -621,15 +647,60 @@
         
         function openRobuxModal() {
             checkLoginBeforeAction(() => {
-                const quantity = prompt('Nhập số lượng Robux bạn muốn mua (1-' + ROBUX_STOCK.toLocaleString() + '):');
-                if (quantity && !isNaN(quantity) && parseInt(quantity) > 0 && parseInt(quantity) <= ROBUX_STOCK) {
-                    const robuxAmount = parseInt(quantity);
-                    const price = robuxAmount * ROBUX_RATE;
-                    if (confirm(`Bạn muốn mua ${robuxAmount.toLocaleString()} Robux với giá ${formatCurrency(price)}?`)) {
-                        addRobuxToCartDirect(robuxAmount, price);
-                    }
-                } else if (quantity) {
-                    alert('Số lượng không hợp lệ!');
+                // Get current user balance
+                const currentBalance = userBalance;
+                const balanceText = `\n\n💰 Số tiền hiện tại của bạn: ${formatCurrency(currentBalance)}`;
+                const maxAffordable = Math.floor(currentBalance / ROBUX_RATE);
+                const maxRobux = Math.min(ROBUX_STOCK, maxAffordable);
+                
+                const quantity = prompt(
+                    `Nhập số lượng Robux bạn muốn mua (1-${ROBUX_STOCK.toLocaleString()}):` +
+                    balanceText +
+                    (maxAffordable > 0 ? `\n📊 Bạn có thể mua tối đa: ${maxAffordable.toLocaleString()} Robux` : '\n⚠️ Bạn không đủ tiền để mua Robux!')
+                );
+                
+                if (!quantity) {
+                    return; // User cancelled
+                }
+                
+                if (isNaN(quantity) || parseInt(quantity) <= 0) {
+                    alert('❌ Số lượng không hợp lệ! Vui lòng nhập số dương.');
+                    return;
+                }
+                
+                const robuxAmount = parseInt(quantity);
+                
+                // Check stock
+                if (robuxAmount > ROBUX_STOCK) {
+                    alert(`❌ Số lượng vượt quá stock hiện có!\n\nStock còn lại: ${ROBUX_STOCK.toLocaleString()} Robux`);
+                    return;
+                }
+                
+                // Calculate price
+                const price = robuxAmount * ROBUX_RATE;
+                
+                // Check if user has enough money
+                if (price > currentBalance) {
+                    const shortage = price - currentBalance;
+                    alert(
+                        `❌ Số tiền không đủ!\n\n` +
+                        `💰 Số tiền hiện có: ${formatCurrency(currentBalance)}\n` +
+                        `💵 Số tiền cần: ${formatCurrency(price)}\n` +
+                        `⚠️ Thiếu: ${formatCurrency(shortage)}\n\n` +
+                        `Vui lòng nạp thêm tiền để tiếp tục mua hàng.`
+                    );
+                    return;
+                }
+                
+                // Confirm purchase
+                if (confirm(
+                    `Xác nhận mua Robux:\n\n` +
+                    `📦 Số lượng: ${robuxAmount.toLocaleString()} Robux\n` +
+                    `💵 Giá tiền: ${formatCurrency(price)}\n` +
+                    `💰 Số dư hiện tại: ${formatCurrency(currentBalance)}\n` +
+                    `💰 Số dư sau khi mua: ${formatCurrency(currentBalance - price)}`
+                )) {
+                    addRobuxToCartDirect(robuxAmount, price);
                 }
             });
         }
@@ -1027,12 +1098,30 @@
                 return;
             }
             
-            // In real app, you would verify the payment here
-            userBalance += amount;
-            saveUserData();
-            document.getElementById('user-balance').textContent = formatCurrency(userBalance);
-            closeTopUpModal();
-            alert(`Đã nạp thành công ${formatCurrency(amount)}!`);
+            // Show waiting message
+            const message = `Đã ghi nhận yêu cầu nạp tiền ${formatCurrency(amount)}.\n\n` +
+                          `Đợi cho đến khi giao dịch của bạn được hoàn thành.\n\n` +
+                          `Chúng tôi sẽ xử lý và cập nhật số dư của bạn trong thời gian sớm nhất.`;
+            
+            if (confirm(message)) {
+                // Save transaction to history
+                const transaction = {
+                    id: 'TXN-' + Date.now(),
+                    type: 'topup',
+                    amount: amount,
+                    status: 'pending', // pending, completed, cancelled
+                    createdAt: new Date().toISOString(),
+                    description: `Nạp tiền ${formatCurrency(amount)}`
+                };
+                
+                // Get user transactions
+                const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${currentUser.email}`) || '[]');
+                userTransactions.push(transaction);
+                localStorage.setItem(`store_transactions_${currentUser.email}`, JSON.stringify(userTransactions));
+                
+                closeTopUpModal();
+                alert('Yêu cầu nạp tiền đã được ghi nhận. Vui lòng đợi xử lý!');
+            }
         }
         
         function checkLoginBeforeAction(callback) {
@@ -1384,6 +1473,70 @@
             document.getElementById('admin-amount').value = '';
         }
         
+        // Transaction History Functions
+        function openTransactionHistory() {
+            if (!currentUser) {
+                alert('Vui lòng đăng nhập để xem lịch sử giao dịch!');
+                return;
+            }
+            document.getElementById('transaction-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            loadTransactionHistory();
+        }
+        
+        function closeTransactionHistory() {
+            document.getElementById('transaction-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        function loadTransactionHistory() {
+            const historyList = document.getElementById('transaction-history-list');
+            if (!historyList || !currentUser) return;
+            
+            const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${currentUser.email}`) || '[]');
+            
+            if (userTransactions.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; padding: 2rem; color: #999;">Chưa có giao dịch nào</p>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedTransactions = [...userTransactions].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            historyList.innerHTML = sortedTransactions.map(transaction => {
+                const statusClass = {
+                    'pending': 'transaction-status-pending',
+                    'completed': 'transaction-status-completed',
+                    'cancelled': 'transaction-status-cancelled'
+                }[transaction.status] || '';
+                
+                const statusText = {
+                    'pending': 'Đang chờ xử lý',
+                    'completed': 'Hoàn thành',
+                    'cancelled': 'Đã hủy'
+                }[transaction.status] || transaction.status;
+                
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-header">
+                            <div>
+                                <strong>${transaction.description}</strong>
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
+                                    ${new Date(transaction.createdAt).toLocaleString('vi-VN')}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.2rem; font-weight: 600; color: #4caf50;">
+                                    +${formatCurrency(transaction.amount)}
+                                </div>
+                                <span class="transaction-status ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
         // Admin tab switching
         function initAdminTabs() {
             document.querySelectorAll('.admin-tab').forEach(tab => {
@@ -1399,8 +1552,150 @@
                         content.classList.remove('active');
                     });
                     document.getElementById(`admin-${tabName}-tab`).classList.add('active');
+                    
+                    // Load data for specific tab
+                    if (tabName === 'transactions') {
+                        loadAdminTransactions();
+                    }
                 });
             });
+        }
+        
+        function loadAdminTransactions() {
+            const transactionsList = document.getElementById('admin-transactions-list');
+            if (!transactionsList) return;
+            
+            // Get all transactions from all users
+            let allTransactions = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('store_transactions_')) {
+                    const userTransactions = JSON.parse(localStorage.getItem(key) || '[]');
+                    const userEmail = key.replace('store_transactions_', '');
+                    userTransactions.forEach(txn => {
+                        allTransactions.push({...txn, userEmail});
+                    });
+                }
+            }
+            
+            // Sort by date (newest first)
+            allTransactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            if (allTransactions.length === 0) {
+                transactionsList.innerHTML = '<p style="text-align: center; padding: 2rem; color: #999;">Chưa có giao dịch nào</p>';
+                return;
+            }
+            
+            transactionsList.innerHTML = allTransactions.map(transaction => {
+                const statusClass = {
+                    'pending': 'transaction-status-pending',
+                    'completed': 'transaction-status-completed',
+                    'cancelled': 'transaction-status-cancelled'
+                }[transaction.status] || '';
+                
+                const statusText = {
+                    'pending': 'Đang chờ xử lý',
+                    'completed': 'Hoàn thành',
+                    'cancelled': 'Đã hủy'
+                }[transaction.status] || transaction.status;
+                
+                return `
+                    <div class="admin-transaction-item">
+                        <div class="admin-transaction-header">
+                            <div>
+                                <strong>${transaction.description}</strong>
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
+                                    ${transaction.userEmail}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.2rem; font-weight: 600; color: #4caf50;">
+                                    +${formatCurrency(transaction.amount)}
+                                </div>
+                                <span class="transaction-status ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #999; margin-top: 0.5rem;">
+                            ${new Date(transaction.createdAt).toLocaleString('vi-VN')}
+                        </div>
+                        ${transaction.status === 'pending' ? `
+                            <div class="admin-transaction-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                <button class="admin-btn-small admin-btn-success" onclick="adminCompleteTransaction('${transaction.id}', '${transaction.userEmail}')">
+                                    <i class="fas fa-check"></i> Xác nhận
+                                </button>
+                                <button class="admin-btn-small admin-btn-danger" onclick="adminCancelTransaction('${transaction.id}', '${transaction.userEmail}')">
+                                    <i class="fas fa-times"></i> Hủy
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function adminCompleteTransaction(transactionId, userEmail) {
+            if (!isAdmin()) {
+                alert('Bạn không có quyền!');
+                return;
+            }
+            
+            if (!confirm('Xác nhận giao dịch này?')) {
+                return;
+            }
+            
+            const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${userEmail}`) || '[]');
+            const transaction = userTransactions.find(t => t.id === transactionId);
+            
+            if (!transaction) {
+                alert('Không tìm thấy giao dịch!');
+                return;
+            }
+            
+            transaction.status = 'completed';
+            transaction.completedAt = new Date().toISOString();
+            localStorage.setItem(`store_transactions_${userEmail}`, JSON.stringify(userTransactions));
+            
+            // Add money to user balance
+            const userKey = `store_balance_${userEmail}`;
+            const currentBalance = parseFloat(localStorage.getItem(userKey) || '0');
+            const newBalance = currentBalance + transaction.amount;
+            localStorage.setItem(userKey, newBalance.toString());
+            
+            // Update current user balance if it's them
+            if (currentUser && currentUser.email === userEmail) {
+                userBalance = newBalance;
+                document.getElementById('user-balance').textContent = formatCurrency(userBalance);
+                saveUserData();
+            }
+            
+            alert('Đã xác nhận giao dịch và cập nhật số dư!');
+            loadAdminTransactions();
+        }
+        
+        function adminCancelTransaction(transactionId, userEmail) {
+            if (!isAdmin()) {
+                alert('Bạn không có quyền!');
+                return;
+            }
+            
+            if (!confirm('Hủy giao dịch này?')) {
+                return;
+            }
+            
+            const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${userEmail}`) || '[]');
+            const transaction = userTransactions.find(t => t.id === transactionId);
+            
+            if (!transaction) {
+                alert('Không tìm thấy giao dịch!');
+                return;
+            }
+            
+            transaction.status = 'cancelled';
+            transaction.cancelledAt = new Date().toISOString();
+            localStorage.setItem(`store_transactions_${userEmail}`, JSON.stringify(userTransactions));
+            
+            alert('Đã hủy giao dịch!');
+            loadAdminTransactions();
         }
         
         // User menu toggle
@@ -1486,6 +1781,10 @@
                 alert('Tính năng cài đặt đang được phát triển');
             });
             
+            // Transaction history event listeners
+            document.getElementById('transaction-history-btn').addEventListener('click', openTransactionHistory);
+            document.getElementById('transaction-modal-close').addEventListener('click', closeTransactionHistory);
+            
             // Admin panel event listeners
             const adminPanelBtn = document.getElementById('admin-panel-btn');
             if (adminPanelBtn) {
@@ -1507,6 +1806,12 @@
             document.getElementById('topup-modal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeTopUpModal();
+                }
+            });
+            
+            document.getElementById('transaction-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeTransactionHistory();
                 }
             });
             
