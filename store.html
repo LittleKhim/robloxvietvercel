@@ -3312,19 +3312,14 @@
             document.body.style.overflow = '';
         }
         
-        function loadTransactionHistory() {
+        async function loadTransactionHistory() {
             const historyList = document.getElementById('transaction-history-list');
             if (!historyList || !currentUser) return;
             
             const userTransactions = JSON.parse(localStorage.getItem(`store_transactions_${currentUser.email}`) || '[]');
             
-            if (userTransactions.length === 0) {
-                historyList.innerHTML = '<p style="text-align: center; padding: 2rem; color: #999;">Chưa có giao dịch nào</p>';
-                return;
-            }
-            
-            // Sort by date (newest first)
-            const sortedTransactions = [...userTransactions].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            // Start with local transactions
+            let allTransactions = [...userTransactions];
             
             // Also load from server
             try {
@@ -3334,29 +3329,30 @@
                     const serverData = await serverResponse.json();
                     const serverTransactions = serverData.transactions || [];
                     
-                    // Merge server transactions with local ones
-                    const allTransactions = [...userTransactions];
+                    // Merge server transactions with local ones (avoid duplicates)
                     serverTransactions.forEach(serverTxn => {
                         if (!allTransactions.find(t => t.id === serverTxn.id)) {
                             allTransactions.push(serverTxn);
                         }
                     });
-                    
-                    // Update sorted transactions
-                    const sortedTransactions = [...allTransactions].sort((a, b) => {
-                        const dateA = new Date(a.createdAt || a.createdAt);
-                        const dateB = new Date(b.createdAt || b.createdAt);
-                        return dateB - dateA;
-                    });
-                    
-                    renderTransactionItems(sortedTransactions, historyList);
-                    return;
                 }
             } catch (error) {
                 console.error('Error loading transactions from server:', error);
             }
             
-            // Fallback to local only
+            // Check if we have any transactions
+            if (allTransactions.length === 0) {
+                historyList.innerHTML = '<div style="text-align: center; padding: 3rem; color: #999;"><i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i><p>Chưa có giao dịch nào</p></div>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedTransactions = allTransactions.sort((a, b) => {
+                const dateA = new Date(a.createdAt || a.createdAt);
+                const dateB = new Date(b.createdAt || b.createdAt);
+                return dateB - dateA;
+            });
+            
             renderTransactionItems(sortedTransactions, historyList);
         }
         
