@@ -1463,6 +1463,12 @@
                     // Update local balance
                     userBalance = serverBalance;
                     localStorage.setItem('store_balance', userBalance.toString());
+                    
+                    // Ensure balance is saved to MongoDB (sync)
+                    await updateBalanceOnServer(userBalance).catch(e => {
+                        console.error('Error syncing balance to MongoDB:', e);
+                    });
+                    
                     saveUserData();
                     
                     // Update UI
@@ -1916,12 +1922,24 @@
                 currentUser = JSON.parse(savedUser);
                 userBalance = savedBalance ? parseFloat(savedBalance) : 0;
                     
-                    // Try to load balance from server
+                    // Try to load balance from server (this will sync with MongoDB)
                     getCurrentBalance().then(balance => {
                         console.log('Balance loaded after localStorage check:', balance);
-                showUserMenu();
+                        // Ensure balance is synced to MongoDB
+                        if (currentUser && balance > 0) {
+                            updateBalanceOnServer(balance).catch(e => {
+                                console.error('Error syncing balance to MongoDB:', e);
+                            });
+                        }
+                        showUserMenu();
                     }).catch(error => {
                         console.error('Error loading balance:', error);
+                        // If loading from server fails, sync localStorage balance to MongoDB
+                        if (currentUser && userBalance > 0) {
+                            updateBalanceOnServer(userBalance).catch(e => {
+                                console.error('Error syncing balance to MongoDB:', e);
+                            });
+                        }
                         showUserMenu();
                     });
             } else {
@@ -1936,13 +1954,48 @@
                 // Clear error parameter from URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else if (urlParams.get('success') || urlParams.has('userId') || urlParams.has('secret')) {
-                // OAuth redirect detected - wait a bit then check session
-                console.log('OAuth redirect detected, checking session...');
-                setTimeout(async () => {
-                    await checkUserSession(0);
-                }, 500);
-                // Clean URL
+                // OAuth redirect detected - retry checking session multiple times
+                console.log('OAuth redirect detected, checking session with retries...');
+                
+                // Clean URL first
                 window.history.replaceState({}, document.title, window.location.pathname);
+                
+                // Retry checking session with increasing delays
+                let retryAttempt = 0;
+                const maxRetries = 5;
+                const checkSessionWithRetry = async () => {
+                    try {
+                        await checkUserSession(retryAttempt);
+                        // If successful, verify user menu is shown
+                        if (currentUser) {
+                            console.log('✅ Login successful, user menu should be visible');
+                            // Force show user menu after a short delay
+                            setTimeout(() => {
+                                if (currentUser) {
+                                    showUserMenu();
+                                }
+                            }, 300);
+                        } else if (retryAttempt < maxRetries) {
+                            retryAttempt++;
+                            console.log(`Retrying session check (${retryAttempt}/${maxRetries})...`);
+                            setTimeout(checkSessionWithRetry, 500 * retryAttempt);
+                        } else {
+                            console.warn('Max retries reached, showing login button');
+                            showLoginButton();
+                        }
+                    } catch (error) {
+                        console.error('Error in session check retry:', error);
+                        if (retryAttempt < maxRetries) {
+                            retryAttempt++;
+                            setTimeout(checkSessionWithRetry, 500 * retryAttempt);
+                        } else {
+                            showLoginButton();
+                        }
+                    }
+                };
+                
+                // Start checking after initial delay
+                setTimeout(checkSessionWithRetry, 300);
             }
         }
         
@@ -1951,7 +2004,12 @@
                 localStorage.setItem('store_user', JSON.stringify(currentUser));
                 localStorage.setItem('store_balance', userBalance.toString());
                 
-                // Also save to MongoDB
+                // Always save balance to MongoDB using the balance API endpoint
+                updateBalanceOnServer(userBalance).catch(error => {
+                    console.error('Error saving balance to server:', error);
+                });
+                
+                // Also save user info to MongoDB
                 saveUserToDB({
                     email: currentUser.email,
                     name: currentUser.name,
@@ -2443,6 +2501,9 @@
                         
                         // Save to localStorage
                         localStorage.setItem('store_balance', userBalance.toString());
+                        
+                        // Ensure balance is saved to MongoDB (in case it wasn't saved before)
+                        await updateBalanceOnServer(userBalance);
                     } else {
                         const errorText = await balanceResponse.text();
                         console.warn('Failed to fetch balance from server:', errorText);
@@ -2450,6 +2511,11 @@
                         const savedBalance = localStorage.getItem('store_balance');
                         userBalance = savedBalance ? parseFloat(savedBalance) : 0;
                         console.log('Balance loaded from localStorage:', userBalance);
+                        
+                        // Save the localStorage balance to MongoDB to ensure it's synced
+                        if (userBalance > 0) {
+                            await updateBalanceOnServer(userBalance);
+                        }
                     }
                 } catch (error) {
                     console.error('Error loading balance:', error);
@@ -2457,6 +2523,13 @@
                     const savedBalance = localStorage.getItem('store_balance');
                     userBalance = savedBalance ? parseFloat(savedBalance) : 0;
                     console.log('Balance loaded from localStorage (error fallback):', userBalance);
+                    
+                    // Save the localStorage balance to MongoDB to ensure it's synced
+                    if (userBalance > 0) {
+                        await updateBalanceOnServer(userBalance).catch(e => {
+                            console.error('Error syncing balance to MongoDB:', e);
+                        });
+                    }
                 }
             
                 // Update balance display immediately
@@ -2478,9 +2551,31 @@
                     }
                 }, 500);
                 
-                // Show user menu immediately
+                // Show user menu immediately and multiple times to ensure it's visible
                 showUserMenu();
                 console.log('✅ User menu displayed for:', currentUser.email);
+                
+                // Force show user menu multiple times to ensure it's visible (especially on mobile)
+                setTimeout(() => {
+                    if (currentUser) {
+                        showUserMenu();
+                        console.log('✅ User menu refreshed (1st check)');
+                    }
+                }, 100);
+                
+                setTimeout(() => {
+                    if (currentUser) {
+                        showUserMenu();
+                        console.log('✅ User menu refreshed (2nd check)');
+                    }
+                }, 500);
+                
+                setTimeout(() => {
+                    if (currentUser) {
+                        showUserMenu();
+                        console.log('✅ User menu refreshed (3rd check)');
+                    }
+                }, 1000);
                 
                 // Force refresh admin panel visibility after login
                 setTimeout(() => {
@@ -2502,11 +2597,19 @@
                         }
                     }
                     
-                    // Double-check user menu is still visible
+                    // Final check user menu is still visible
                     if (currentUser) {
                         showUserMenu();
+                        console.log('✅ Final user menu check');
+                        
+                        // Final sync: ensure balance is saved to MongoDB
+                        if (userBalance > 0) {
+                            updateBalanceOnServer(userBalance).catch(e => {
+                                console.error('Error in final balance sync:', e);
+                            });
+                        }
                     }
-                }, 200);
+                }, 1500);
                 
                 // Check for auto-renewal subscriptions
                 checkAutoRenewalSubscriptions();
@@ -2529,19 +2632,34 @@
             } catch (error) {
                 console.error('Error checking user session:', error);
                 
-                // If this is after OAuth redirect and first attempt failed, retry once
+                // If this is after OAuth redirect and first attempt failed, retry more times
                 const urlParams = new URLSearchParams(window.location.search);
                 const isOAuthRedirect = urlParams.has('success') || urlParams.has('userId') || urlParams.has('secret');
                 
-                if (isOAuthRedirect && retryCount < 2) {
-                    console.log(`OAuth redirect detected, retrying session check (${retryCount + 1}/2)...`);
-                    // Wait a bit for Appwrite to process the session
-                    await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+                if (isOAuthRedirect && retryCount < 4) {
+                    console.log(`OAuth redirect detected, retrying session check (${retryCount + 1}/4)...`);
+                    // Wait a bit for Appwrite to process the session (increasing delay)
+                    await new Promise(resolve => setTimeout(resolve, 800 * (retryCount + 1)));
                     return checkUserSession(retryCount + 1);
                 }
                 
-                // User is not logged in, clear state and show login button
+                // User is not logged in
                 console.log('❌ No active session found');
+                
+                // Check localStorage as fallback
+                const savedUser = localStorage.getItem('store_user');
+                if (savedUser) {
+                    try {
+                        currentUser = JSON.parse(savedUser);
+                        console.log('✅ Restored user from localStorage after session check failed');
+                        showUserMenu();
+                        return;
+                    } catch (e) {
+                        console.error('Error parsing saved user:', e);
+                    }
+                }
+                
+                // Clear state and show login button
                 currentUser = null;
                 localStorage.removeItem('store_user');
                 showLoginButton();
@@ -4090,7 +4208,51 @@
                 });
             });
             
+            // Load user data first
             loadUserData();
+            
+            // Also check user data when page becomes visible (handles tab switching)
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && !currentUser) {
+                    console.log('Page became visible, checking user data...');
+                    const savedUser = localStorage.getItem('store_user');
+                    if (savedUser) {
+                        try {
+                            currentUser = JSON.parse(savedUser);
+                            const savedBalance = localStorage.getItem('store_balance');
+                            userBalance = savedBalance ? parseFloat(savedBalance) : 0;
+                            showUserMenu();
+                            console.log('✅ User restored from localStorage on visibility change');
+                        } catch (e) {
+                            console.error('Error parsing saved user:', e);
+                        }
+                    }
+                }
+            });
+            
+            // Check user session periodically if not logged in (for OAuth redirects)
+            setInterval(() => {
+                if (!currentUser) {
+                    const savedUser = localStorage.getItem('store_user');
+                    if (savedUser) {
+                        try {
+                            currentUser = JSON.parse(savedUser);
+                            const savedBalance = localStorage.getItem('store_balance');
+                            userBalance = savedBalance ? parseFloat(savedBalance) : 0;
+                            showUserMenu();
+                            console.log('✅ User restored from localStorage on interval check');
+                        } catch (e) {
+                            console.error('Error parsing saved user:', e);
+                        }
+                    } else {
+                        // Try to check session if no saved user
+                        checkUserSession().catch(() => {
+                            // Silently fail if session check fails
+                        });
+                    }
+                }
+            }, 2000); // Check every 2 seconds
+            
             loadStockFromDB();
             renderProducts();
             updateCart();
