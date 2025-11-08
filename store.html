@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="vi">
+<link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/b/b5/ROBLOX_Studio_icon.png" type="image/png" />
+
+<head>
+    <meta name="og:type" content="website">
+    <meta name="og:title" content="Cửa Hàng Script Roblox - Mua Script, Fix Script, Làm Script">
+    <meta name="og:description" content="Cửa hàng chuyên cung cấp các dịch vụ Script Roblox: Mua script, Fix script, Làm script theo yêu cầu.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cửa Hàng Script Roblox - Mua Script, Fix Script, Làm Script</title>
+    <link rel="stylesheet" href="store-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <nav id="main-nav" class="nav-visible">
+        <div class="nav-content nav-centered">
+            <ul class="nav-menu">
+                <li class="nav-item-desktop"><a href="index.html" data-i18n="nav.home">Trang Chủ</a></li>
+                <li class="nav-item-desktop"><a href="#products" data-i18n="nav.products">Sản Phẩm</a></li>
+                <li class="nav-item-desktop"><a href="#about" data-i18n="nav.about">Về Chúng Tôi</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <div class="user-menu-container" id="user-menu-container" style="display: none;">
+                <button class="user-menu-btn" id="user-menu-btn">
+                    <span class="user-name" id="user-name"></span>
+                    <span class="user-balance" id="user-balance">0₫</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="user-dropdown" id="user-dropdown">
+                    <button class="user-dropdown-item" id="top-up-btn">
+                        <i class="fas fa-wallet"></i> Nạp Tiền
+                    </button>
+                    <button class="user-dropdown-item" id="settings-btn">
+                        <i class="fas fa-cog"></i> Cài Đặt
+                    </button>
+                    <button class="user-dropdown-item" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                    </button>
+                </div>
+            </div>
+            <div id="google-signin-container" class="google-signin-container"></div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <section class="store-hero">
+            <h1 data-i18n="store.title">Cửa Hàng Roblox</h1>
+            <p class="store-subtitle" data-i18n="store.subtitle">Mua Robux, Vật Phẩm Game với giá tốt nhất</p>
+        </section>
+
+
+        <!-- Shopping Cart Sidebar -->
+        <div class="cart-sidebar" id="cart-sidebar">
+            <div class="cart-header">
+                <h2 data-i18n="cart.title">Giỏ Hàng</h2>
+                <button class="cart-close" id="cart-close">&times;</button>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <p class="cart-empty" data-i18n="cart.empty">Giỏ hàng trống</p>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span data-i18n="cart.total">Tổng cộng:</span>
+                    <span id="cart-total-price">0₫</span>
+                </div>
+                <button class="cart-checkout-btn" id="checkout-btn" data-i18n="cart.checkout">Thanh Toán</button>
+            </div>
+        </div>
+
+        <!-- Order Modal -->
+        <div class="order-modal-overlay" id="order-modal">
+            <div class="order-modal-container">
+                <button class="order-modal-close" id="order-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="order-modal-content">
+                    <h2 data-i18n="order.title">Đặt Hàng</h2>
+                    <div class="order-items-list" id="order-items-list">
+                        <!-- Order items will be inserted here -->
+                    </div>
+                    <div class="order-total-section">
+                        <div class="order-total-row">
+                            <span data-i18n="order.total">Tổng cộng:</span>
+                            <span id="order-total-price">0₫</span>
+                        </div>
+                    </div>
+                    <div class="order-code-section">
+                        <label data-i18n="order.codeLabel">Mã Đơn Hàng:</label>
+                        <div class="order-code-container">
+                            <input type="text" id="order-code-input" readonly>
+                        </div>
+                    </div>
+                    <div class="order-actions">
+                        <a href="#" id="facebook-order-btn" class="facebook-order-btn" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                            <span data-i18n="order.contactFacebook">Nhắn tin Facebook với mã đơn hàng</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top-Up Modal -->
+        <div class="topup-modal-overlay" id="topup-modal">
+            <div class="topup-modal-container">
+                <button class="topup-modal-close" id="topup-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="topup-modal-content">
+                    <h2>Nạp Tiền</h2>
+                    <div class="topup-amount-section">
+                        <label>Số tiền muốn nạp (VND):</label>
+                        <input type="number" id="topup-amount" min="10000" step="10000" placeholder="Nhập số tiền" value="100000">
+                    </div>
+                    <div class="topup-info-section">
+                        <h3>Thông tin chuyển khoản:</h3>
+                        <div class="topup-qr-container">
+                            <div class="topup-qr-placeholder">
+                                <i class="fas fa-qrcode"></i>
+                                <p>QR Code sẽ hiển thị ở đây</p>
+                                <p class="topup-note">Vui lòng quét QR để chuyển khoản</p>
+                            </div>
+                        </div>
+                        <div class="topup-bank-info">
+                            <p><strong>Ngân hàng:</strong> <span id="topup-bank-name">Vietcombank</span></p>
+                            <p><strong>Số tài khoản:</strong> <span id="topup-account-number">1234567890</span></p>
+                            <p><strong>Chủ tài khoản:</strong> <span id="topup-account-name">NGUYEN VAN A</span></p>
+                        </div>
+                        <div class="topup-random-info">
+                            <h4>Thông tin xác nhận (bắt buộc):</h4>
+                            <p class="topup-random-code">Mã xác nhận: <strong id="topup-random-code">ABC123XYZ</strong></p>
+                            <p class="topup-note">Vui lòng ghi chú khi chuyển khoản: <strong id="topup-note-code">ABC123XYZ</strong></p>
+                        </div>
+                        <div class="topup-actions">
+                            <button class="topup-confirm-btn" id="topup-confirm-btn">
+                                <i class="fas fa-check"></i> Đã chuyển khoản
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Required Modal -->
+        <div class="login-modal-overlay" id="login-modal">
+            <div class="login-modal-container">
+                <div class="login-modal-content">
+                    <h2>Đăng Nhập Để Tiếp Tục</h2>
+                    <p>Vui lòng đăng nhập bằng Google để mua hàng</p>
+                    <div id="google-signin-modal"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="products-title" id="products" data-i18n="products.title">Sản Phẩm</div>
+        <section class="products-grid" id="products-grid">
+            <!-- Products will be loaded dynamically -->
+        </section>
+
+        <div class="about-title" id="about" data-i18n="about.title">Về Cửa Hàng</div>
+        <section class="about-section">
+            <div class="about-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3 data-i18n="about.quality">Chất Lượng Đảm Bảo</h3>
+                <p data-i18n="about.qualityDesc">Tất cả script đều được kiểm tra kỹ lưỡng trước khi giao hàng</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-clock"></i>
+                <h3 data-i18n="about.fast">Giao Hàng Nhanh</h3>
+                <p data-i18n="about.fastDesc">Hoàn thành trong 24-48 giờ tùy theo độ phức tạp</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-headset"></i>
+                <h3 data-i18n="about.support">Hỗ Trợ 24/7</h3>
+                <p data-i18n="about.supportDesc">Đội ngũ hỗ trợ luôn sẵn sàng giải đáp thắc mắc</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-main">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-title" data-i18n="footer.aboutTitle">Về Chúng Tôi</div>
+                    <div class="footer-desc" data-i18n="footer.aboutDesc">Cửa hàng chuyên cung cấp Robux và vật phẩm game Roblox với giá cả hợp lý.</div>
+                    <div class="footer-location"><i class="fas fa-map-marker-alt"></i> <span data-i18n="footer.location">Hà Nội, Việt Nam</span></div>
+                </div>
+                <div class="footer-section">
+                    <div class="footer-title" data-i18n="footer.contactTitle">Liên Hệ</div>
+                    <div class="footer-contact">
+                        <div><i class="fas fa-envelope"></i> <a href="mailto:dgkktok@gmail.com">dgkktok@gmail.com</a></div>
+                        <div><i class="fab fa-facebook"></i> <a href="https://www.facebook.com/dreamisdreamforever" target="_blank" data-i18n="footer.facebook">Facebook</a></div>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <div class="footer-title" data-i18n="footer.linksTitle">Liên Kết</div>
+                    <div class="footer-links">
+                        <a href="index.html" data-i18n="footer.linkHome">Trang Chủ</a>
+                        <a href="#products" data-i18n="footer.linkProducts">Sản Phẩm</a>
+                        <a href="https://www.littlekhim.online/" target="_blank" data-i18n="footer.linkPortfolio">Portfolio</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-social-row">
+                    <a href="https://x.com/dgkktok" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.facebook.com/dreamisdreamforever" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                </div>
+                <p>&copy; 2024 <span data-i18n="footer.copyright">Cửa Hàng Script Roblox. Tất cả quyền được bảo lưu.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Navigation Buttons -->
+    <div class="floating-nav-buttons">
+        <a href="dev.html" class="floating-nav-btn dev-nav-btn" title="Đào Tạo">
+            <i class="fas fa-graduation-cap"></i>
+        </a>
+        <a href="cheat.html" class="floating-nav-btn cheat-nav-btn" title="Cheat Code">
+            <i class="fas fa-fire"></i>
+        </a>
+        <button class="floating-nav-btn cart-nav-btn" id="cart-icon" title="Giỏ Hàng">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="floating-cart-count" id="cart-count">0</span>
+        </button>
+        <a href="https://www.littlekhim.online/" target="_blank" class="floating-nav-btn portfolio-nav-btn" title="Portfolio">
+            <i class="fas fa-briefcase"></i>
+        </a>
+    </div>
+
+    <script>
+        // Cart functionality
+        let cart = [];
+        // Robux rate and stock
+        const ROBUX_RATE = 125; // 1 Robux = 125 VND
+        const ROBUX_STOCK = 10000; // 10k Robux available
+        
+        const products = [
+            {
+                id: 'robux-custom',
+                name: { vi: "Mua Robux (Tùy Chỉnh)", en: "Buy Robux (Custom)" },
+                description: { vi: `Mua Robux theo số lượng bạn muốn. Rate: ${ROBUX_RATE}₫/Robux. Stock: ${ROBUX_STOCK.toLocaleString()} Robux`, en: `Buy Robux in any amount. Rate: ${ROBUX_RATE}₫/Robux. Stock: ${ROBUX_STOCK.toLocaleString()} Robux` },
+                price: 0, // Will be calculated based on quantity
+                icon: "fas fa-coins",
+                isCustomRobux: true,
+                rate: ROBUX_RATE,
+                stock: ROBUX_STOCK
+            },
+            {
+                id: 5,
+                name: { vi: "Vật Phẩm Game", en: "Game Items" },
+                description: { vi: "Các vật phẩm độc đáo trong game Roblox", en: "Unique items in Roblox games" },
+                price: 100000,
+                icon: "fas fa-gem"
+            },
+            {
+                id: 6,
+                name: { vi: "Premium Pass", en: "Premium Pass" },
+                description: { vi: "Premium Pass cho các game phổ biến", en: "Premium Pass for popular games" },
+                price: 150000,
+                icon: "fas fa-crown"
+            }
+        ];
+        
+        // Discord webhook URL - Replace with your actual webhook URL
+        const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL_HERE';
+        
+        // User management
+        let currentUser = null;
+        let userBalance = 0;
+        
+        // Bank info for top-up (replace with your actual info)
+        const BANK_INFO = {
+            bankName: 'Vietcombank',
+            accountNumber: '1234567890',
+            accountName: 'NGUYEN VAN A',
+            qrCodeUrl: 'https://via.placeholder.com/300x300?text=QR+Code' // Replace with your QR code image URL
+        };
+
+        let currentLanguage = 'vi';
+        const exchangeRate = 24000;
+
+        const translations = {
+            vi: {
+                'nav.home': 'Trang Chủ',
+                'nav.products': 'Sản Phẩm',
+                'nav.about': 'Về Chúng Tôi',
+                'nav.portfolio': 'Portfolio',
+                'nav.dev': 'Đào Tạo',
+                'nav.cheat': 'Cheat Code',
+                'store.title': 'Cửa Hàng Roblox',
+                'store.subtitle': 'Mua Robux, Vật Phẩm Game với giá tốt nhất',
+                'products.title': 'Sản Phẩm',
+                'about.title': 'Về Cửa Hàng',
+                'about.quality': 'Chất Lượng Đảm Bảo',
+                'about.qualityDesc': 'Tất cả Robux và vật phẩm đều được kiểm tra kỹ lưỡng trước khi giao hàng',
+                'about.fast': 'Giao Hàng Nhanh',
+                'about.fastDesc': 'Giao hàng nhanh chóng trong vòng 5-15 phút',
+                'about.support': 'Hỗ Trợ 24/7',
+                'about.supportDesc': 'Đội ngũ hỗ trợ luôn sẵn sàng giải đáp thắc mắc',
+                'cart.title': 'Giỏ Hàng',
+                'cart.empty': 'Giỏ hàng trống',
+                'cart.total': 'Tổng cộng:',
+                'cart.checkout': 'Thanh Toán',
+                'order.title': 'Đặt Hàng',
+                'order.total': 'Tổng cộng:',
+                'order.codeLabel': 'Mã Đơn Hàng:',
+                'order.contactFacebook': 'Nhắn tin Facebook với mã đơn hàng',
+                'cart.remove': 'Xóa',
+                'cart.add': 'Thêm vào giỏ',
+                'footer.aboutTitle': 'Về Chúng Tôi',
+                'footer.aboutDesc': 'Cửa hàng chuyên cung cấp Robux và vật phẩm game Roblox với giá cả hợp lý.',
+                'footer.location': 'Hà Nội, Việt Nam',
+                'footer.contactTitle': 'Liên Hệ',
+                'footer.facebook': 'Facebook',
+                'footer.linksTitle': 'Liên Kết',
+                'footer.linkHome': 'Trang Chủ',
+                'footer.linkProducts': 'Sản Phẩm',
+                'footer.linkPortfolio': 'Portfolio',
+                'footer.copyright': 'Cửa Hàng Roblox. Tất cả quyền được bảo lưu.'
+            },
+            en: {
+                'nav.home': 'Home',
+                'nav.products': 'Products',
+                'nav.about': 'About',
+                'nav.portfolio': 'Portfolio',
+                'nav.dev': 'Training',
+                'nav.cheat': 'Cheat Code',
+                'store.title': 'Roblox Script Store',
+                'store.subtitle': 'Buy Script, Fix Script, Create Script on demand',
+                'products.title': 'Products',
+                'about.title': 'About Store',
+                'about.quality': 'Quality Guaranteed',
+                'about.qualityDesc': 'All scripts are thoroughly tested before delivery',
+                'about.fast': 'Fast Delivery',
+                'about.fastDesc': 'Completed within 24-48 hours depending on complexity',
+                'about.support': '24/7 Support',
+                'about.supportDesc': 'Support team is always ready to answer questions',
+                'cart.title': 'Shopping Cart',
+                'cart.empty': 'Cart is empty',
+                'cart.total': 'Total:',
+                'cart.checkout': 'Checkout',
+                'order.title': 'Place Order',
+                'order.total': 'Total:',
+                'order.codeLabel': 'Order Code:',
+                'order.contactFacebook': 'Message Facebook with order code',
+                'cart.remove': 'Remove',
+                'cart.add': 'Add to Cart',
+                'footer.aboutTitle': 'About Us',
+                'footer.aboutDesc': 'Store specializing in high-quality Roblox Script services at reasonable prices.',
+                'footer.location': 'Hanoi, Vietnam',
+                'footer.contactTitle': 'Contact',
+                'footer.facebook': 'Facebook',
+                'footer.linksTitle': 'Links',
+                'footer.linkHome': 'Home',
+                'footer.linkProducts': 'Products',
+                'footer.linkPortfolio': 'Portfolio',
+                'footer.copyright': 'Roblox Script Store. All rights reserved.'
+            }
+        };
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                const translated = translations[currentLanguage]?.[key];
+                if (translated !== undefined) {
+                    el.textContent = translated;
+                }
+            });
+        }
+
+        function formatCurrency(amount) {
+            if (currentLanguage === 'en') {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount / exchangeRate);
+            }
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        function renderProducts() {
+            const productsGrid = document.getElementById('products-grid');
+            productsGrid.innerHTML = products.map(product => {
+                const name = product.name[currentLanguage] || product.name.vi;
+                const description = product.description[currentLanguage] || product.description.vi;
+                
+                if (product.isCustomRobux) {
+                    return `
+                        <div class="product-card robux-custom-card">
+                            <div class="product-icon">
+                                <i class="${product.icon}"></i>
+                            </div>
+                            <h3 class="product-name">${name}</h3>
+                            <p class="product-description">${description}</p>
+                            <div class="robux-input-section">
+                                <label>Số lượng Robux:</label>
+                                <input type="number" id="robux-quantity-${product.id}" 
+                                       min="1" max="${product.stock}" 
+                                       value="100" 
+                                       class="robux-quantity-input"
+                                       onchange="updateRobuxPrice('${product.id}')">
+                                <div class="robux-price-display" id="robux-price-${product.id}">
+                                    ${formatCurrency(100 * product.rate)}
+                                </div>
+                            </div>
+                            <button class="product-btn" onclick="addRobuxToCart('${product.id}')" data-i18n="cart.add">
+                                <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <i class="${product.icon}"></i>
+                        </div>
+                        <h3 class="product-name">${name}</h3>
+                        <p class="product-description">${description}</p>
+                        <div class="product-price">${formatCurrency(product.price)}</div>
+                        <button class="product-btn" onclick="addToCart(${typeof product.id === 'string' ? `'${product.id}'` : product.id})" data-i18n="cart.add">
+                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            applyTranslations();
+        }
+        
+        function updateRobuxPrice(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || !product.isCustomRobux) return;
+            
+            const input = document.getElementById(`robux-quantity-${productId}`);
+            const priceDisplay = document.getElementById(`robux-price-${productId}`);
+            let quantity = parseInt(input.value) || 0;
+            
+            if (quantity > product.stock) {
+                input.value = product.stock;
+                quantity = product.stock;
+            }
+            
+            if (quantity < 1) {
+                input.value = 1;
+                quantity = 1;
+            }
+            
+            const totalPrice = quantity * product.rate;
+            priceDisplay.textContent = formatCurrency(totalPrice);
+        }
+        
+        function addRobuxToCart(productId) {
+            checkLoginBeforeAction(() => {
+                const product = products.find(p => p.id === productId);
+                if (!product || !product.isCustomRobux) return;
+                
+                const input = document.getElementById(`robux-quantity-${productId}`);
+                const quantity = parseInt(input.value) || 0;
+                
+                if (quantity < 1) {
+                    alert(currentLanguage === 'vi' ? 'Vui lòng nhập số lượng Robux hợp lệ!' : 'Please enter a valid Robux amount!');
+                    return;
+                }
+                
+                if (quantity > product.stock) {
+                    alert(currentLanguage === 'vi' ? `Số lượng vượt quá stock hiện có (${product.stock.toLocaleString()} Robux)!` : `Amount exceeds available stock (${product.stock.toLocaleString()} Robux)!`);
+                    return;
+                }
+                
+                const price = quantity * product.rate;
+                const cartItem = {
+                    ...product,
+                    quantity: quantity,
+                    price: price,
+                    robuxAmount: quantity
+                };
+                
+                // Check if custom Robux already in cart
+                const existingIndex = cart.findIndex(item => item.id === productId);
+                if (existingIndex >= 0) {
+                    cart[existingIndex] = cartItem; // Replace with new quantity
+                } else {
+                    cart.push(cartItem);
+                }
+                
+                updateCart();
+            });
+        }
+
+        function addToCart(productId) {
+            checkLoginBeforeAction(() => {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    // Skip if it's custom Robux (use addRobuxToCart instead)
+                    if (product.isCustomRobux) {
+                        addRobuxToCart(productId);
+                        return;
+                    }
+                    
+                    const existingItem = cart.find(item => item.id === productId);
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push({ ...product, quantity: 1 });
+                    }
+                    updateCart();
+                }
+            });
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotalPrice = document.getElementById('cart-total-price');
+
+            cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = `<p class="cart-empty" data-i18n="cart.empty">Giỏ hàng trống</p>`;
+            } else {
+                cartItems.innerHTML = cart.map(item => {
+                    const name = item.name[currentLanguage] || item.name.vi;
+                    const displayName = item.isCustomRobux && item.robuxAmount 
+                        ? `${name} (${item.robuxAmount.toLocaleString()} Robux)`
+                        : name;
+                    return `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <h4>${displayName}</h4>
+                                <p>${formatCurrency(item.price)}${item.quantity > 1 ? ` x ${item.quantity}` : ''}</p>
+                            </div>
+                            <div class="cart-item-actions">
+                                <button class="cart-remove-btn" onclick="removeFromCart(${typeof item.id === 'string' ? `'${item.id}'` : item.id})" data-i18n="cart.remove">Xóa</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotalPrice.textContent = formatCurrency(total);
+            applyTranslations();
+        }
+
+        function openCart() {
+            document.getElementById('cart-sidebar').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCart() {
+            document.getElementById('cart-sidebar').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function generateOrderCode() {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `ORD-${timestamp}-${random}`;
+        }
+
+        function openOrderModal() {
+            if (cart.length === 0) {
+                alert(currentLanguage === 'vi' ? 'Giỏ hàng trống!' : 'Cart is empty!');
+                return;
+            }
+            
+            const orderModal = document.getElementById('order-modal');
+            const orderCode = generateOrderCode();
+            const orderCodeInput = document.getElementById('order-code-input');
+            const orderItemsList = document.getElementById('order-items-list');
+            const orderTotalPrice = document.getElementById('order-total-price');
+            
+            // Set order code
+            orderCodeInput.value = orderCode;
+            
+            // Display order items
+            const itemsHtml = cart.map(item => {
+                const name = item.name[currentLanguage] || item.name.vi;
+                const displayName = item.isCustomRobux && item.robuxAmount 
+                    ? `${name} (${item.robuxAmount.toLocaleString()} Robux)`
+                    : name;
+                const itemTotal = item.price * item.quantity;
+                return `
+                    <div class="order-item-row">
+                        <span class="order-item-name">${displayName} x${item.quantity}</span>
+                        <span class="order-item-price">${formatCurrency(itemTotal)}</span>
+                    </div>
+                `;
+            }).join('');
+            orderItemsList.innerHTML = itemsHtml;
+            
+            // Calculate and display total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            orderTotalPrice.textContent = formatCurrency(total);
+            
+            // Update Facebook link with order code
+            const facebookBtn = document.getElementById('facebook-order-btn');
+            const facebookLink = 'https://m.me/dreamisdreamforever';
+            const message = encodeURIComponent(`Xin chào! Tôi muốn đặt hàng với mã đơn hàng: ${orderCode}`);
+            facebookBtn.href = `${facebookLink}?text=${message}`;
+            
+            // Send Discord webhook
+            sendDiscordWebhook(orderCode, cart, total);
+            
+            // Show modal
+            orderModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        async function sendDiscordWebhook(orderCode, cartItems, total) {
+            if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL === 'YOUR_DISCORD_WEBHOOK_URL_HERE') {
+                console.warn('Discord webhook URL not configured');
+                return;
+            }
+            
+            const itemsList = cartItems.map(item => {
+                const name = item.name[currentLanguage] || item.name.vi;
+                const displayName = item.isCustomRobux && item.robuxAmount 
+                    ? `${name} (${item.robuxAmount.toLocaleString()} Robux)`
+                    : name;
+                return `- ${displayName} x${item.quantity} - ${formatCurrency(item.price * item.quantity)}`;
+            }).join('\n');
+            
+            const embed = {
+                title: '🛒 Đơn Hàng Mới',
+                description: `Mã đơn hàng: **${orderCode}**`,
+                color: 0x4caf50,
+                fields: [
+                    {
+                        name: '📦 Sản Phẩm',
+                        value: itemsList || 'Không có sản phẩm',
+                        inline: false
+                    },
+                    {
+                        name: '💰 Tổng Tiền',
+                        value: formatCurrency(total),
+                        inline: true
+                    },
+                    {
+                        name: '🕐 Thời Gian',
+                        value: new Date().toLocaleString('vi-VN'),
+                        inline: true
+                    }
+                ],
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        embeds: [embed]
+                    })
+                });
+            } catch (error) {
+                console.error('Failed to send Discord webhook:', error);
+            }
+        }
+
+        function closeOrderModal() {
+            const orderModal = document.getElementById('order-modal');
+            orderModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+
+        function checkout() {
+            openOrderModal();
+        }
+        
+        // User management functions
+        function loadUserData() {
+            const savedUser = localStorage.getItem('store_user');
+            const savedBalance = localStorage.getItem('store_balance');
+            
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                userBalance = savedBalance ? parseFloat(savedBalance) : 0;
+                showUserMenu();
+            } else {
+                showLoginButton();
+            }
+        }
+        
+        function saveUserData() {
+            if (currentUser) {
+                localStorage.setItem('store_user', JSON.stringify(currentUser));
+                localStorage.setItem('store_balance', userBalance.toString());
+            }
+        }
+        
+        function showUserMenu() {
+            document.getElementById('user-menu-container').style.display = 'block';
+            document.getElementById('google-signin-container').style.display = 'none';
+            document.getElementById('user-name').textContent = currentUser.name || currentUser.email;
+            document.getElementById('user-balance').textContent = formatCurrency(userBalance);
+        }
+        
+        function showLoginButton() {
+            document.getElementById('user-menu-container').style.display = 'none';
+            document.getElementById('google-signin-container').style.display = 'block';
+            initializeGoogleSignIn();
+        }
+        
+        function logout() {
+            currentUser = null;
+            userBalance = 0;
+            localStorage.removeItem('store_user');
+            localStorage.removeItem('store_balance');
+            showLoginButton();
+        }
+        
+        function generateRandomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 9; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        function openTopUpModal() {
+            const modal = document.getElementById('topup-modal');
+            const randomCode = generateRandomCode();
+            
+            document.getElementById('topup-bank-name').textContent = BANK_INFO.bankName;
+            document.getElementById('topup-account-number').textContent = BANK_INFO.accountNumber;
+            document.getElementById('topup-account-name').textContent = BANK_INFO.accountName;
+            document.getElementById('topup-random-code').textContent = randomCode;
+            document.getElementById('topup-note-code').textContent = randomCode;
+            
+            // Update QR code (you can replace this with actual QR code generation)
+            const qrContainer = document.querySelector('.topup-qr-placeholder');
+            qrContainer.innerHTML = `
+                <img src="${BANK_INFO.qrCodeUrl}" alt="QR Code" style="max-width: 300px; height: auto; border-radius: 0.5rem;">
+                <p class="topup-note">Vui lòng quét QR để chuyển khoản</p>
+            `;
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeTopUpModal() {
+            document.getElementById('topup-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        function confirmTopUp() {
+            const amount = parseFloat(document.getElementById('topup-amount').value);
+            if (amount < 10000) {
+                alert('Số tiền tối thiểu là 10,000₫');
+                return;
+            }
+            
+            // In real app, you would verify the payment here
+            userBalance += amount;
+            saveUserData();
+            document.getElementById('user-balance').textContent = formatCurrency(userBalance);
+            closeTopUpModal();
+            alert(`Đã nạp thành công ${formatCurrency(amount)}!`);
+        }
+        
+        function checkLoginBeforeAction(callback) {
+            if (!currentUser) {
+                document.getElementById('login-modal').style.display = 'flex';
+                return;
+            }
+            callback();
+        }
+        
+        function initializeGoogleSignIn() {
+            // Wait for Google Sign-In to load
+            if (typeof google === 'undefined') {
+                setTimeout(initializeGoogleSignIn, 100);
+                return;
+            }
+            
+            google.accounts.id.initialize({
+                client_id: 'YOUR_GOOGLE_CLIENT_ID_HERE', // Replace with your Google Client ID
+                callback: handleCredentialResponse,
+                auto_select: false
+            });
+            
+            google.accounts.id.renderButton(
+                document.getElementById('google-signin-container'),
+                { theme: 'outline', size: 'large', text: 'signin_with', locale: 'vi' }
+            );
+            
+            google.accounts.id.renderButton(
+                document.getElementById('google-signin-modal'),
+                { theme: 'outline', size: 'large', text: 'signin_with', locale: 'vi' }
+            );
+        }
+        
+        function handleCredentialResponse(response) {
+            // Decode JWT token (in production, verify on server)
+            const payload = JSON.parse(atob(response.credential.split('.')[1]));
+            
+            currentUser = {
+                email: payload.email,
+                name: payload.name,
+                picture: payload.picture,
+                sub: payload.sub
+            };
+            
+            // Load existing balance or start with 0
+            const savedBalance = localStorage.getItem('store_balance');
+            userBalance = savedBalance ? parseFloat(savedBalance) : 0;
+            
+            saveUserData();
+            showUserMenu();
+            document.getElementById('login-modal').style.display = 'none';
+        }
+        
+        // User menu toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('user-menu-container');
+            const dropdown = document.getElementById('user-dropdown');
+            if (userMenu && !userMenu.contains(event.target) && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Header scroll behavior
+        let lastScroll = 0;
+        const nav = document.getElementById('main-nav');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll <= 10) {
+                nav.classList.add('nav-visible');
+                nav.classList.remove('nav-hidden');
+            } else if (currentScroll > lastScroll && currentScroll > 100) {
+                nav.classList.add('nav-hidden');
+                nav.classList.remove('nav-visible');
+            } else {
+                nav.classList.add('nav-visible');
+                nav.classList.remove('nav-hidden');
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
+            renderProducts();
+            updateCart();
+            applyTranslations();
+
+            document.getElementById('cart-icon').addEventListener('click', () => {
+                checkLoginBeforeAction(openCart);
+            });
+            document.getElementById('cart-close').addEventListener('click', closeCart);
+            document.getElementById('checkout-btn').addEventListener('click', () => {
+                checkLoginBeforeAction(checkout);
+            });
+            document.getElementById('order-modal-close').addEventListener('click', closeOrderModal);
+            document.getElementById('user-menu-btn').addEventListener('click', toggleUserMenu);
+            document.getElementById('top-up-btn').addEventListener('click', openTopUpModal);
+            document.getElementById('topup-modal-close').addEventListener('click', closeTopUpModal);
+            document.getElementById('topup-confirm-btn').addEventListener('click', confirmTopUp);
+            document.getElementById('logout-btn').addEventListener('click', logout);
+            document.getElementById('settings-btn').addEventListener('click', () => {
+                alert('Tính năng cài đặt đang được phát triển');
+            });
+            
+            // Close modals when clicking outside
+            document.getElementById('order-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeOrderModal();
+                }
+            });
+            
+            document.getElementById('topup-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeTopUpModal();
+                }
+            });
+            
+            document.getElementById('login-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+
+            document.getElementById('cart-sidebar').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCart();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

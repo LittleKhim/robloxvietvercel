@@ -24,13 +24,11 @@
     <nav id="main-nav" class="nav-visible">
         <div class="nav-content nav-centered">
             <ul class="nav-menu">
-                <li class="nav-item-desktop"><a href="#" id="home-link" data-i18n="nav.home">Home</a></li>
+                <li class="nav-item-desktop"><a href="index.html" id="home-link" data-i18n="nav.home">Home</a></li>
                 <li class="nav-item-desktop"><a href="#pricing" data-i18n="nav.pricing">Price</a></li>
                 <li class="nav-item-desktop"><a href="#courses" data-i18n="nav.courses">Courses</a></li>
                 <li class="nav-item-desktop"><a href="#" id="register-link" data-i18n="nav.register">Register</a></li>
             
-                <li class="nav-item-portfolio"><a href="https://www.littlekhim.online/" target="_blank" class="portfolio-link"><i class="fas fa-briefcase"></i> <span data-i18n="nav.portfolio">Portfolio</span></a></li>
-             
             </ul>
                 </div>
         <div class="nav-right ">
@@ -361,48 +359,17 @@
         </div>
     </footer>
 
-    <!-- Dark Mode Button -->
-    <button id="dark-mode-btn" class="dark-mode-btn" title="Dark Mode">
-        <i class="fas fa-moon"></i>
-    </button>
-
-    <!-- Dark Mode Page (Cheat Code Services) -->
-    <div id="dark-mode-page" class="dark-mode-page">
-        <button class="dark-mode-close" id="dark-mode-close">&times;</button>
-        <div class="dark-mode-content">
-            <h1 class="dark-mode-title" data-i18n="darkMode.title">Buôn Bán Làm Cheat Code Roblox</h1>
-            <div class="dark-mode-services">
-                <div class="dark-service-card">
-                    <i class="fas fa-code"></i>
-                    <h3 data-i18n="darkMode.scriptTitle">Script Roblox</h3>
-                    <p data-i18n="darkMode.scriptDesc">Tạo script tùy chỉnh cho game Roblox của bạn</p>
-                </div>
-                <div class="dark-service-card">
-                    <i class="fas fa-tools"></i>
-                    <h3 data-i18n="darkMode.fixTitle">Fix Script</h3>
-                    <p data-i18n="darkMode.fixDesc">Sửa lỗi và tối ưu hóa script hiện có</p>
-                </div>
-                <div class="dark-service-card">
-                    <i class="fas fa-wrench"></i>
-                    <h3 data-i18n="darkMode.makeTitle">Làm Script</h3>
-                    <p data-i18n="darkMode.makeDesc">Phát triển script mới từ đầu theo yêu cầu</p>
-                </div>
-            </div>
-            <div class="dark-mode-contact">
-                <p data-i18n="darkMode.contact">Liên hệ qua Facebook hoặc Email để đặt hàng</p>
-                <div class="dark-mode-buttons">
-                    <a href="https://www.facebook.com/dreamisdreamforever" target="_blank" class="dark-btn facebook-btn">
-                        <i class="fab fa-facebook"></i> Facebook
-                    </a>
-                    <a href="mailto:dgkktok@gmail.com" class="dark-btn email-btn">
-                        <i class="fas fa-envelope"></i> Email
-                    </a>
-                    <a href="store.html" class="dark-btn store-btn">
-                        <i class="fas fa-store"></i> <span data-i18n="darkMode.storeMode">Store Mode</span>
-                    </a>
-                </div>
-            </div>
-        </div>
+    <!-- Floating Navigation Buttons -->
+    <div class="floating-nav-buttons">
+        <a href="store.html" class="floating-nav-btn store-nav-btn" title="Cửa Hàng">
+            <i class="fas fa-store"></i>
+        </a>
+        <a href="cheat.html" class="floating-nav-btn cheat-nav-btn" title="Cheat Code">
+            <i class="fas fa-fire"></i>
+        </a>
+        <a href="https://www.littlekhim.online/" target="_blank" class="floating-nav-btn portfolio-nav-btn" title="Portfolio">
+            <i class="fas fa-briefcase"></i>
+        </a>
     </div>
 
     <script>
@@ -612,6 +579,8 @@
             'nav.courses': 'Courses',
             'nav.register': 'Register',
             'nav.portfolio': 'Portfolio',
+            'nav.store': 'Cửa Hàng',
+            'nav.cheat': 'Cheat Code',
             'hero.title': 'Đào Tạo Lập Trình Lua',
             'hero.subtitle': 'Học lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm',
             'hero.tagline': 'Khóa học theo gói hoặc học theo giờ - Kèm 1-1 cá nhân hóa',
@@ -727,16 +696,7 @@
             'footer.linkRegister': 'Đăng Ký',
             'footer.linkPortfolio': 'Portfolio',
             'footer.caption': '',
-            'footer.copyright': '&copy; 2024 Đào Tạo Lua. Tất cả quyền được bảo lưu.',
-            'darkMode.title': 'Buôn Bán Làm Cheat Code Roblox',
-            'darkMode.scriptTitle': 'Script Roblox',
-            'darkMode.scriptDesc': 'Tạo script tùy chỉnh cho game Roblox của bạn',
-            'darkMode.fixTitle': 'Fix Script',
-            'darkMode.fixDesc': 'Sửa lỗi và tối ưu hóa script hiện có',
-            'darkMode.makeTitle': 'Làm Script',
-            'darkMode.makeDesc': 'Phát triển script mới từ đầu theo yêu cầu',
-            'darkMode.contact': 'Liên hệ qua Facebook hoặc Email để đặt hàng',
-            'darkMode.storeMode': 'Store Mode'
+            'footer.copyright': '&copy; 2024 Đào Tạo Lua. Tất cả quyền được bảo lưu.'
         },
         en: {
             'meta.title': 'Lua Programming Training - Professional Lua Courses',
@@ -745,6 +705,8 @@
             'nav.courses': 'Courses',
             'nav.register': 'Register',
             'nav.portfolio': 'Portfolio',
+            'nav.store': 'Store',
+            'nav.cheat': 'Cheat Code',
             'hero.title': 'Lua Programming Training',
             'hero.subtitle': 'Learn professional Lua programming with a tutor who has 4+ years of experience',
             'hero.tagline': 'Choose structured courses or hourly 1-on-1 coaching tailored to you',
@@ -859,16 +821,7 @@
             'footer.linkCourses': 'Courses',
             'footer.linkRegister': 'Register',
             'footer.linkPortfolio': 'Portfolio',
-            'footer.copyright': '&copy; 2024 Lua Training. All rights reserved.',
-            'darkMode.title': 'Roblox Cheat Code Services',
-            'darkMode.scriptTitle': 'Roblox Script',
-            'darkMode.scriptDesc': 'Create custom scripts for your Roblox games',
-            'darkMode.fixTitle': 'Fix Script',
-            'darkMode.fixDesc': 'Fix bugs and optimize existing scripts',
-            'darkMode.makeTitle': 'Create Script',
-            'darkMode.makeDesc': 'Develop new scripts from scratch as requested',
-            'darkMode.contact': 'Contact via Facebook or Email to place an order',
-            'darkMode.storeMode': 'Store Mode'
+            'footer.copyright': '&copy; 2024 Lua Training. All rights reserved.'
         }
     };
 
@@ -1097,10 +1050,17 @@
             const nameText = currentLanguage === 'en' && partner.nameEn ? partner.nameEn : partner.name;
             const descriptionText = partner.description && (partner.description[currentLanguage] || partner.description.vi || partner.description.en || '');
             const icon = partner.icon || 'fas fa-user';
+            const imageUrl = partner.imageUrl || '';
+            
+            // Use image if available, otherwise use icon
+            const avatarContent = imageUrl && imageUrl.trim() !== '' 
+                ? `<img src="${imageUrl}" alt="${nameText}" class="partner-image">`
+                : `<i class="${icon}"></i>`;
+            
             return `
                 <div class="partner-card">
                     <div class="partner-avatar">
-                        <i class="${icon}"></i>
+                        ${avatarContent}
                     </div>
                     <div class="partner-name">${nameText}</div>
                     <div class="partner-role">${roleText}</div>
@@ -1546,39 +1506,4 @@ setLanguage('vi');
     window.addEventListener('scroll', handleStatsGridAnimation);
     window.addEventListener('DOMContentLoaded', handleStatsGridAnimation);
 
-    // Dark Mode Button Handler
-    const darkModeBtn = document.getElementById('dark-mode-btn');
-    const darkModePage = document.getElementById('dark-mode-page');
-    const darkModeClose = document.getElementById('dark-mode-close');
-
-    if (darkModeBtn) {
-        darkModeBtn.addEventListener('click', function() {
-            darkModePage.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-    }
-
-    if (darkModeClose) {
-        darkModeClose.addEventListener('click', function() {
-            darkModePage.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-
-    if (darkModePage) {
-        darkModePage.addEventListener('click', function(e) {
-            if (e.target === darkModePage) {
-                darkModePage.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-    }
-
-    // Close dark mode with Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && darkModePage.classList.contains('active')) {
-            darkModePage.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
     </script>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/b/b5/ROBLOX_Studio_icon.png" type="image/png" />
+
+<head>
+    <meta name="og:type" content="website">
+    <meta name="og:title" content="Lua Programming - Training, Store & Services">
+    <meta name="og:description" content="Đào tạo Lua, Cửa hàng Script, và Dịch vụ Cheat Code Roblox">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua Programming - Training, Store & Services</title>
+    <link rel="stylesheet" href="index-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <main class="landing-main">
+        <div class="landing-container">
+            <h1 class="landing-title" data-i18n="landing.title">Welcome to The Lazy Store</h1>
+            <p class="landing-subtitle" data-i18n="landing.subtitle">Chọn dịch vụ bạn muốn sử dụng</p>
+            
+            <!-- Interactive Rocket -->
+            <div class="interactive-rocket" id="rocket">
+                <i class="fas fa-rocket"></i>
+            </div>
+            
+            <div class="landing-buttons">
+                <a href="dev.html" class="landing-btn dev-btn">
+                    <div class="btn-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h2 data-i18n="landing.devTitle">Trang Đào Tạo</h2>
+                    <p data-i18n="landing.devDesc">Học lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm</p>
+                </a>
+                
+                <a href="store.html" class="landing-btn store-btn">
+                    <div class="btn-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h2 data-i18n="landing.storeTitle">Cửa Hàng</h2>
+                    <p data-i18n="landing.storeDesc">Mua Script, Fix Script, Làm Script theo yêu cầu</p>
+                </a>
+                
+                <a href="cheat.html" class="landing-btn cheat-btn">
+                    <div class="btn-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <h2 data-i18n="landing.cheatTitle">Dịch Vụ Cheat Code</h2>
+                    <p data-i18n="landing.cheatDesc">Buôn bán làm Cheat Code Roblox - Script, Fix, Làm Script</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const translations = {
+            vi: {
+                'landing.title': 'Welcome to The Lazy Store',
+                'landing.subtitle': 'Chọn dịch vụ bạn muốn sử dụng',
+                'landing.devTitle': 'Trang Đào Tạo',
+                'landing.devDesc': 'Học lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm',
+                'landing.storeTitle': 'Cửa Hàng',
+                'landing.storeDesc': 'Mua Robux, Vật Phẩm Game với giá tốt nhất',
+                'landing.cheatTitle': 'Dịch Vụ Cheat Code',
+                'landing.cheatDesc': 'Buôn bán làm Cheat Code Roblox - Script, Fix, Làm Script'
+            },
+            en: {
+                'landing.title': 'Welcome to The Lazy Store',
+                'landing.subtitle': 'Chọn dịch vụ bạn muốn sử dụng',
+                'landing.devTitle': 'Trang Đào Tạo',
+                'landing.devDesc': 'Học lập trình Lua chuyên nghiệp với giáo viên có 4+ năm kinh nghiệm',
+                'landing.storeTitle': 'Cửa Hàng',
+                'landing.storeDesc': 'Mua Robux, Vật Phẩm Game với giá tốt nhất',
+                'landing.cheatTitle': 'Dịch Vụ Cheat Code',
+                'landing.cheatDesc': 'Buôn bán làm Cheat Code Roblox - Script, Fix, Làm Script'
+            }
+        };
+
+        let currentLanguage = 'vi';
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                const translated = translations[currentLanguage]?.[key];
+                if (translated !== undefined) {
+                    el.textContent = translated;
+                }
+            });
+        }
+
+        function detectLocale() {
+            // Always use Vietnamese for index page
+            currentLanguage = 'vi';
+            applyTranslations();
+        }
+
+        // Interactive Rocket - Smooth follow mouse
+        let rocket = null;
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let rocketX = window.innerWidth / 2;
+        let rocketY = window.innerHeight / 2;
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        let animationFrameId = null;
+
+        function initRocket() {
+            rocket = document.getElementById('rocket');
+            if (!rocket) return;
+
+            // Set initial position
+            rocketX = window.innerWidth / 2;
+            rocketY = window.innerHeight / 2;
+            rocket.style.left = rocketX + 'px';
+            rocket.style.top = rocketY + 'px';
+
+            // Track mouse position
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            // Smooth follow animation
+            function animateRocket() {
+                if (!rocket) return;
+                
+                if (!isDragging) {
+                    const dx = mouseX - rocketX;
+                    const dy = mouseY - rocketY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Smooth movement with easing
+                    if (distance > 2) {
+                        const speed = Math.min(distance * 0.15, 20);
+                        rocketX += (dx / distance) * speed;
+                        rocketY += (dy / distance) * speed;
+                        
+                        rocket.style.left = rocketX + 'px';
+                        rocket.style.top = rocketY + 'px';
+                        
+                        // Always rotate towards mouse
+                        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                        rocket.style.transform = `rotate(${angle + 90}deg)`;
+                    }
+                }
+                
+                animationFrameId = requestAnimationFrame(animateRocket);
+            }
+            
+            animateRocket();
+
+            // Drag functionality
+            rocket.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                dragOffsetX = e.clientX - rocketX;
+                dragOffsetY = e.clientY - rocketY;
+                rocket.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    rocketX = e.clientX - dragOffsetX;
+                    rocketY = e.clientY - dragOffsetY;
+                    rocket.style.left = rocketX + 'px';
+                    rocket.style.top = rocketY + 'px';
+                    
+                    // Still rotate towards mouse when dragging
+                    const dx = e.clientX - rocketX;
+                    const dy = e.clientY - rocketY;
+                    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                    rocket.style.transform = `rotate(${angle + 90}deg)`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    rocket.style.cursor = 'grab';
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (rocketX > window.innerWidth) rocketX = window.innerWidth - 50;
+                if (rocketY > window.innerHeight) rocketY = window.innerHeight - 50;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            detectLocale();
+            initRocket();
+        });
+    </script>
+</body>
+</html>
+

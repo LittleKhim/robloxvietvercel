@@ -6,7 +6,12 @@
       "vi": "Youtuber",
       "en": "Youtuber"
     },
-    "icon": "fas fa-user"
+    "description": {
+      "vi": "Youtuber nổi tiếng về nội dung Roblox và lập trình",
+      "en": "Famous YouTuber for Roblox and programming content"
+    },
+    "icon": "fas fa-user",
+    "imageUrl": ""
   },
   {
     "name": "Morldev",
@@ -15,16 +20,26 @@
       "vi": "Dev nổi tiếng 100K+ followers",
       "en": "Dev with 100K+ followers"
     },
-    "icon": "fas fa-user"
+    "description": {
+      "vi": "Developer có hơn 100K followers, chuyên về phát triển game Roblox",
+      "en": "Developer with over 100K followers, specializing in Roblox game development"
+    },
+    "icon": "fas fa-user",
+    "imageUrl": ""
   },
-    {
+  {
     "name": "Nowell",
     "nameEn": "Nowell",
     "role": {
       "vi": "Dev nổi tiếng ở Philipines",
       "en": "Famous Dev in the Philippines"
     },
-    "icon": "fas fa-user"
+    "description": {
+      "vi": "Developer nổi tiếng tại Philippines, có nhiều kinh nghiệm trong lĩnh vực Roblox",
+      "en": "Famous developer in the Philippines with extensive experience in Roblox"
+    },
+    "icon": "fas fa-user",
+    "imageUrl": ""
   }
 ]
 
