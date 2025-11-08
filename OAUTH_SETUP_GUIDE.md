@@ -27,22 +27,47 @@ npx http-server
 ```
 Mở URL hiển thị (thường là `http://localhost:8080/store.html`)
 
-## Bước 2: Cấu Hình Appwrite Platform
+## Bước 2: Cấu Hình Appwrite Platform (Web Platform)
 
-1. Vào [Appwrite Console](https://cloud.appwrite.io)
-2. Chọn project của bạn (Project ID: `690ec5bf00043292a7e0`)
-3. Vào **Settings** → **Platforms**
-4. Thêm platform mới hoặc chỉnh sửa platform hiện có:
+### Cách Thêm Web Platform trong Appwrite:
+
+1. **Vào Appwrite Console:**
+   - Truy cập [https://cloud.appwrite.io](https://cloud.appwrite.io)
+   - Đăng nhập vào tài khoản của bạn
+
+2. **Chọn Project:**
+   - Chọn project của bạn (Project ID: `690ec5bf00043292a7e0`)
+
+3. **Vào Settings → Platforms:**
+   - Click vào **Settings** ở menu bên trái
+   - Chọn **Platforms** từ menu con
+
+4. **Thêm Platform Mới:**
+   - Click nút **"Add Platform"** hoặc **"Create Platform"**
+   - Chọn **"Web App"** từ danh sách các loại platform
+
+5. **Điền Thông Tin Platform:**
+
+   **Cho Development (Localhost):**
+   - **Name**: `Local Development` (hoặc tên bạn muốn)
    - **Type**: Web App
-   - **Name**: Local Development (hoặc tên bạn muốn)
-   - **Hostname**: 
-     - Nếu dùng Live Server: `127.0.0.1` hoặc `localhost`
-     - Nếu dùng Python: `localhost`
+   - **Hostname**: `localhost` hoặc `127.0.0.1`
    - **Port**: 
      - Live Server: `5500` (hoặc port hiển thị)
      - Python: `8000`
-     - Node.js: `8080` (hoặc port hiển thị)
-5. **Lưu lại**
+     - Node.js: `8080` hoặc port bạn đang dùng
+   - Click **"Create"** hoặc **"Save"**
+
+   **Cho Production (Domain của bạn):**
+   - **Name**: `Production` (hoặc tên bạn muốn)
+   - **Type**: Web App
+   - **Hostname**: `www.thelazy.store`
+   - **Port**: (Để trống cho HTTPS, hoặc `443`)
+   - Click **"Create"** hoặc **"Save"**
+
+6. **Xác Nhận:**
+   - Platform sẽ xuất hiện trong danh sách
+   - Đảm bảo platform đã được kích hoạt (Active)
 
 ## Bước 3: Cấu Hình Google Cloud Console
 
