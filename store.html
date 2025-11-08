@@ -1411,6 +1411,15 @@
         let subscriptionCoupon = null;
         
         async function checkCouponCode() {
+            if (!currentUser || !currentUser.email) {
+                const couponStatus = document.getElementById('coupon-status');
+                if (couponStatus) {
+                    couponStatus.style.display = 'block';
+                    couponStatus.className = 'coupon-status error';
+                    couponStatus.innerHTML = `<i class="fas fa-times-circle"></i> Vui lòng đăng nhập để sử dụng mã giảm giá`;
+                }
+                return;
+            }
             const couponInput = document.getElementById('coupon-code-input');
             const couponStatus = document.getElementById('coupon-status');
             const discountItem = document.getElementById('coupon-discount-item');
@@ -1428,7 +1437,9 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE_URL}/coupons/check?code=${encodeURIComponent(couponCode)}`);
+                // Include user email to check if they've already used this coupon
+                const email = encodeURIComponent(currentUser.email);
+                const response = await fetch(`${API_BASE_URL}/coupons/check?code=${encodeURIComponent(couponCode)}&email=${email}`);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -5248,7 +5259,12 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE_URL}/coupons/check?code=${encodeURIComponent(couponCode)}`);
+                // Include user email to check if they've already used this coupon
+                if (!currentUser || !currentUser.email) {
+                    throw new Error('Vui lòng đăng nhập để sử dụng mã giảm giá');
+                }
+                const email = encodeURIComponent(currentUser.email);
+                const response = await fetch(`${API_BASE_URL}/coupons/check?code=${encodeURIComponent(couponCode)}&email=${email}`);
                 
                 if (response.ok) {
                     const data = await response.json();

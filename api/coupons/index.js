@@ -7,11 +7,21 @@ export default async function handler(req, res) {
     // Handle coupon check (GET with code query param or action=check)
     if (req.method === 'GET' && (req.query.code || req.query.action === 'check')) {
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const couponsCollection = db.collection('coupons');
+            const logsCollection = db.collection('coupon_logs');
             
             const code = req.query.code?.toUpperCase().trim();
+            const email = req.query.email; // User email to check if they've used this coupon
             
             if (!code) {
                 return res.status(400).json({ valid: false, message: 'Mã giảm giá không được để trống' });
@@ -38,6 +48,22 @@ export default async function handler(req, res) {
                 return res.status(200).json({ valid: false, message: 'Mã giảm giá đã hết lượt sử dụng' });
             }
             
+            // Check if user has already used this coupon (if email provided)
+            if (email) {
+                const userUsedCoupon = await logsCollection.findOne({
+                    couponCode: code,
+                    email: email,
+                    status: 'completed'
+                });
+                
+                if (userUsedCoupon) {
+                    return res.status(200).json({ 
+                        valid: false, 
+                        message: 'Bạn đã sử dụng mã giảm giá này rồi. Mỗi tài khoản chỉ được sử dụng 1 lần.' 
+                    });
+                }
+            }
+            
             return res.status(200).json({ 
                 valid: true, 
                 coupon: {
@@ -50,24 +76,52 @@ export default async function handler(req, res) {
         } catch (error) {
             console.error('Error checking coupon:', error);
             res.status(500).json({ valid: false, message: 'Lỗi kiểm tra mã giảm giá' });
-        } finally {
-            await client.close();
         }
+        // Don't close client in serverless - connection pooling handles it automatically
         return;
     }
     
     // Handle coupon usage logging (POST with action=use)
     if (req.method === 'POST' && req.query.action === 'use') {
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const logsCollection = db.collection('coupon_logs');
+            const couponsCollection = db.collection('coupons');
             
             const { code, email, amount, originalAmount, discount, type, quantity } = req.body;
             
+            if (!code || !email) {
+                return res.status(400).json({ error: 'Code and email are required' });
+            }
+            
+            const couponCode = code.toUpperCase().trim();
+            
+            // Check if user has already used this coupon
+            const existingUse = await logsCollection.findOne({
+                couponCode: couponCode,
+                email: email,
+                status: 'completed'
+            });
+            
+            if (existingUse) {
+                return res.status(400).json({ 
+                    error: 'Bạn đã sử dụng mã giảm giá này rồi. Mỗi tài khoản chỉ được sử dụng 1 lần.',
+                    alreadyUsed: true
+                });
+            }
+            
             // Log the coupon usage (will be marked as completed when purchase is confirmed)
             const log = {
-                couponCode: code.toUpperCase().trim(),
+                couponCode: couponCode,
                 email: email,
                 amount: amount,
                 originalAmount: originalAmount,
@@ -83,16 +137,23 @@ export default async function handler(req, res) {
             res.status(200).json({ success: true });
         } catch (error) {
             console.error('Error logging coupon usage:', error);
-            res.status(500).json({ error: 'Failed to log coupon usage' });
-        } finally {
-            await client.close();
+            res.status(500).json({ error: 'Failed to log coupon usage', details: error.message });
         }
+        // Don't close client in serverless - connection pooling handles it automatically
         return;
     }
     
     if (req.method === 'GET') {
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const couponsCollection = db.collection('coupons');
             
@@ -112,12 +173,19 @@ export default async function handler(req, res) {
         } catch (error) {
             console.error('Error getting coupons:', error);
             res.status(500).json({ error: 'Failed to get coupons' });
-        } finally {
-            await client.close();
         }
+        // Don't close client in serverless - connection pooling handles it automatically
     } else if (req.method === 'POST') {
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const couponsCollection = db.collection('coupons');
             
@@ -151,12 +219,19 @@ export default async function handler(req, res) {
         } catch (error) {
             console.error('Error creating coupon:', error);
             res.status(500).json({ error: 'Failed to create coupon' });
-        } finally {
-            await client.close();
         }
+        // Don't close client in serverless - connection pooling handles it automatically
     } else if (req.method === 'DELETE') {
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const couponsCollection = db.collection('coupons');
             
@@ -176,9 +251,8 @@ export default async function handler(req, res) {
         } catch (error) {
             console.error('Error deleting coupon:', error);
             res.status(500).json({ error: 'Failed to delete coupon' });
-        } finally {
-            await client.close();
         }
+        // Don't close client in serverless - connection pooling handles it automatically
     } else {
         res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
         res.status(405).json({ error: 'Method not allowed' });
