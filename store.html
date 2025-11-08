@@ -3536,6 +3536,8 @@
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
                 loadMarketplaceItems(1, 'all');
+                // Start auto-refresh
+                initMarketplaceAutoRefresh();
             });
         }
         
@@ -3543,31 +3545,114 @@
             const modal = document.getElementById('marketplace-modal');
             modal.style.display = 'none';
             document.body.style.overflow = '';
+            // Stop auto-refresh when modal closes
+            if (marketplaceItemsCache.refreshInterval) {
+                clearInterval(marketplaceItemsCache.refreshInterval);
+                marketplaceItemsCache.refreshInterval = null;
+            }
         }
+        
+        // Marketplace Data Cache
+        let marketplaceItemsCache = {
+            all: {}, // Cache by category and search
+            lastUpdate: null,
+            refreshInterval: null
+        };
         
         let currentMarketplacePage = 1;
         let marketplacePagination = null;
         let currentMarketplaceCategory = 'all';
         let currentMarketplaceSearch = '';
         
-        async function loadMarketplaceItems(page = 1, category = 'all', search = '') {
+        // Initialize marketplace auto-refresh
+        function initMarketplaceAutoRefresh() {
+            // Clear existing interval
+            if (marketplaceItemsCache.refreshInterval) {
+                clearInterval(marketplaceItemsCache.refreshInterval);
+            }
+            
+            // Auto-refresh every 30 seconds when marketplace modal is open
+            marketplaceItemsCache.refreshInterval = setInterval(() => {
+                const marketplaceModal = document.getElementById('marketplace-modal');
+                if (marketplaceModal && marketplaceModal.style.display !== 'none') {
+                    // Only refresh if on browse tab
+                    const browseTab = document.getElementById('marketplace-browse-tab');
+                    if (browseTab && browseTab.classList.contains('active')) {
+                        console.log('🔄 Auto-refreshing marketplace items...');
+                        loadMarketplaceItems(currentMarketplacePage, currentMarketplaceCategory, currentMarketplaceSearch, true);
+                    }
+                }
+            }, 30000); // 30 seconds
+        }
+        
+        // Get cache key
+        function getMarketplaceCacheKey(category, search, page) {
+            return `${category}_${search || ''}_${page}`;
+        }
+        
+        async function loadMarketplaceItems(page = 1, category = 'all', search = '', forceRefresh = false) {
             try {
                 currentMarketplacePage = page;
                 currentMarketplaceCategory = category;
                 currentMarketplaceSearch = search;
+                
+                const cacheKey = getMarketplaceCacheKey(category, search, page);
+                const now = Date.now();
+                
+                // Check cache (only if not forcing refresh and cache is less than 10 seconds old)
+                if (!forceRefresh && marketplaceItemsCache.all[cacheKey]) {
+                    const cached = marketplaceItemsCache.all[cacheKey];
+                    if (now - cached.timestamp < 10000) { // 10 seconds cache
+                        console.log('📦 Using cached marketplace items');
+                        renderMarketplaceItems(cached.items);
+                        marketplacePagination = cached.pagination;
+                        renderPagination('marketplace-pagination', marketplacePagination, (p) => loadMarketplaceItems(p, category, search));
+                        return;
+                    }
+                }
+                
                 const categoryParam = category === 'all' ? '' : `&category=${category}`;
                 const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
                 const response = await fetch(`${API_BASE_URL}/marketplace?page=${page}&limit=12${categoryParam}${searchParam}`);
+                
                 if (response.ok) {
                     const data = await response.json();
                     const items = data.items || [];
                     marketplacePagination = data.pagination;
+                    
+                    // Update cache
+                    marketplaceItemsCache.all[cacheKey] = {
+                        items: items,
+                        pagination: marketplacePagination,
+                        timestamp: now
+                    };
+                    marketplaceItemsCache.lastUpdate = now;
+                    
                     renderMarketplaceItems(items);
                     renderPagination('marketplace-pagination', marketplacePagination, (p) => loadMarketplaceItems(p, category, search));
+                    
+                    console.log('✅ Marketplace items loaded and cached');
+                } else {
+                    console.error('Failed to load marketplace items:', response.status);
                 }
             } catch (error) {
                 console.error('Error loading marketplace items:', error);
             }
+        }
+        
+        // Clear marketplace cache
+        function clearMarketplaceCache() {
+            marketplaceItemsCache.all = {};
+            marketplaceItemsCache.lastUpdate = null;
+            console.log('🗑️ Marketplace cache cleared');
+        }
+        
+        // Add new item to cache (when user posts a new item)
+        function addItemToMarketplaceCache(item) {
+            // Clear all caches to force refresh
+            clearMarketplaceCache();
+            // Reload current view
+            loadMarketplaceItems(currentMarketplacePage, currentMarketplaceCategory, currentMarketplaceSearch, true);
         }
         
         function handleMarketplaceSearch(event) {
@@ -3789,8 +3874,21 @@
                     document.getElementById('sell-item-phone').value = '';
                     document.getElementById('sell-item-facebook').value = '';
                     document.getElementById('sell-item-image-preview').style.display = 'none';
-                    // Reload items
-                    loadMarketplaceItems(1);
+                    
+                    // Add to cache and reload with real-time update
+                    if (data.item) {
+                        addItemToMarketplaceCache(data.item);
+                    } else {
+                        // Force refresh if item data not returned
+                        clearMarketplaceCache();
+                        loadMarketplaceItems(1, currentMarketplaceCategory, currentMarketplaceSearch, true);
+                    }
+                    
+                    // Switch to browse tab to show the new item
+                    const browseTab = document.querySelector('.marketplace-tab[data-tab="browse"]');
+                    if (browseTab) {
+                        browseTab.click();
+                    }
                 } else {
                     if (data.insufficientBalance) {
                         showNotification('Lỗi', data.error || 'Số dư không đủ!', 'error');
@@ -4094,8 +4192,10 @@
                 });
                 
                 if (response.ok) {
-                    showNotification('Thành công', 'Đã duyệt sản phẩm!', 'success');
-                    loadPendingProducts();
+                showNotification('Thành công', 'Đã duyệt sản phẩm!', 'success');
+                // Clear marketplace cache to show new verified item
+                clearMarketplaceCache();
+                loadPendingProducts();
                 } else {
                     throw new Error('Failed to verify');
                 }
@@ -4122,6 +4222,8 @@
                 
                 if (response.ok) {
                     showNotification('Thành công', 'Đã từ chối sản phẩm!', 'success');
+                    // Clear marketplace cache
+                    clearMarketplaceCache();
                     loadPendingProducts();
                 } else {
                     throw new Error('Failed to reject');

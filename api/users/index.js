@@ -10,7 +10,15 @@ export default async function handler(req, res) {
     const email = req.query.email;
     
     try {
-        await client.connect();
+        // Connect if not already connected (connection pooling handles reuse)
+        try {
+            await client.connect();
+        } catch (err) {
+            // Ignore error if already connected
+            if (err.message && !err.message.includes('already connected')) {
+                throw err;
+            }
+        }
         const db = client.db('store_db');
         const usersCollection = db.collection('users');
         const blacklistCollection = db.collection('blacklist');
@@ -232,7 +240,6 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('Users API error:', error);
         res.status(500).json({ error: 'Failed to process request', details: error.message });
-    } finally {
-        await client.close();
     }
+    // Don't close client in serverless - connection pooling handles it automatically
 }

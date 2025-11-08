@@ -14,7 +14,15 @@ function isAdmin(email) {
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const marketplaceCollection = db.collection('marketplace');
             
@@ -108,13 +116,20 @@ export default async function handler(req, res) {
             });
         } catch (error) {
             console.error('Error getting marketplace items:', error);
-            res.status(500).json({ error: 'Failed to get marketplace items' });
-        } finally {
-            await client.close();
+            res.status(500).json({ error: 'Failed to get marketplace items', details: error.message });
         }
+        // Don't close client in serverless - connection pooling handles it
     } else if (req.method === 'POST') {
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const marketplaceCollection = db.collection('marketplace');
             
@@ -204,10 +219,9 @@ export default async function handler(req, res) {
             });
         } catch (error) {
             console.error('Error creating marketplace item:', error);
-            res.status(500).json({ error: 'Failed to create marketplace item' });
-        } finally {
-            await client.close();
+            res.status(500).json({ error: 'Failed to create marketplace item', details: error.message });
         }
+        // Don't close client in serverless - connection pooling handles it automatically
     } else if (req.method === 'PUT') {
         // Verify or update item (admin only for verify)
         const { id } = req.query;
@@ -218,7 +232,15 @@ export default async function handler(req, res) {
         }
         
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const marketplaceCollection = db.collection('marketplace');
             
@@ -312,10 +334,9 @@ export default async function handler(req, res) {
                 res.status(200).json({ success: true, message: 'Item updated' });
             } catch (error) {
                 console.error('Error updating item:', error);
-                res.status(500).json({ error: 'Failed to update item' });
-            } finally {
-                await client.close();
+                res.status(500).json({ error: 'Failed to update item', details: error.message });
             }
+            // Don't close client in serverless - connection pooling handles it automatically
         }
     } else if (req.method === 'DELETE') {
         // Delete item (seller or admin)
@@ -327,7 +348,15 @@ export default async function handler(req, res) {
         }
         
         try {
-            await client.connect();
+            // Connect if not already connected (connection pooling handles reuse)
+            try {
+                await client.connect();
+            } catch (err) {
+                // Ignore error if already connected
+                if (err.message && !err.message.includes('already connected')) {
+                    throw err;
+                }
+            }
             const db = client.db('store_db');
             const marketplaceCollection = db.collection('marketplace');
             
@@ -350,10 +379,9 @@ export default async function handler(req, res) {
             res.status(200).json({ success: true, message: 'Item deleted' });
         } catch (error) {
             console.error('Error deleting item:', error);
-            res.status(500).json({ error: 'Failed to delete item' });
-        } finally {
-            await client.close();
+            res.status(500).json({ error: 'Failed to delete item', details: error.message });
         }
+        // Don't close client in serverless - connection pooling handles it automatically
     } else {
         res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
         res.status(405).json({ error: 'Method not allowed' });
