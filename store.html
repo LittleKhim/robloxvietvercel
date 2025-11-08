@@ -514,9 +514,15 @@
                 </div>
                 <div class="marketplace-modal-content">
                     <div class="marketplace-tabs">
-                        <button class="marketplace-tab active" data-tab="browse">Duyệt Sản Phẩm</button>
-                        <button class="marketplace-tab" data-tab="sell">Đăng Bán</button>
-                        <button class="marketplace-tab" data-tab="my-items">Sản Phẩm Của Tôi</button>
+                        <button class="marketplace-tab active" data-tab="browse">
+                            <i class="fas fa-store"></i> Duyệt Sản Phẩm
+                        </button>
+                        <button class="marketplace-tab" data-tab="sell">
+                            <i class="fas fa-upload"></i> Đăng Bán
+                        </button>
+                        <button class="marketplace-tab" data-tab="my-items">
+                            <i class="fas fa-box"></i> Sản Phẩm Của Tôi
+                        </button>
                     </div>
                     
                     <!-- Browse Tab -->
@@ -1970,20 +1976,46 @@
         function showUserMenu() {
             if (!currentUser) {
                 console.warn('showUserMenu called but currentUser is null');
-                showLoginButton();
-                return;
+                // Try to restore from localStorage
+                const savedUser = localStorage.getItem('store_user');
+                if (savedUser) {
+                    try {
+                        currentUser = JSON.parse(savedUser);
+                        console.log('✅ Restored user from localStorage:', currentUser.email);
+                    } catch (e) {
+                        console.error('Error parsing saved user:', e);
+                        showLoginButton();
+                        return;
+                    }
+                } else {
+                    showLoginButton();
+                    return;
+                }
             }
+            
             const userMenuContainer = document.getElementById('user-menu-container');
             const signinContainer = document.getElementById('google-signin-container');
             const adminBtn = document.getElementById('admin-panel-btn');
             
-            if (userMenuContainer) userMenuContainer.style.display = 'block';
-            if (signinContainer) signinContainer.style.display = 'none';
+            if (userMenuContainer) {
+                userMenuContainer.style.display = 'block';
+                console.log('✅ User menu container displayed');
+            }
+            if (signinContainer) {
+                signinContainer.style.display = 'none';
+                console.log('✅ Login button hidden');
+            }
             
             const userNameEl = document.getElementById('user-name');
             const userBalanceEl = document.getElementById('user-balance');
-            if (userNameEl) userNameEl.textContent = currentUser.name || currentUser.email;
-            if (userBalanceEl) userBalanceEl.textContent = formatCurrency(userBalance);
+            if (userNameEl) {
+                userNameEl.textContent = currentUser.name || currentUser.email;
+                console.log('✅ User name displayed:', currentUser.name || currentUser.email);
+            }
+            if (userBalanceEl) {
+                userBalanceEl.textContent = formatCurrency(userBalance);
+                console.log('✅ User balance displayed:', userBalance);
+            }
             
             // Show admin button if user is admin
             if (adminBtn) {
@@ -1992,8 +2024,6 @@
                 
                 if (adminStatus) {
                     adminBtn.style.display = 'block';
-                    adminBtn.removeAttribute('style'); // Remove inline style
-                    adminBtn.style.display = 'block'; // Set to block
                     console.log('✅ Admin panel button is now visible');
                 } else {
                     adminBtn.style.display = 'none';
@@ -2383,8 +2413,9 @@
                     sub: user.$id
                 };
                 
-                // Save user data immediately
-                saveUserData();
+                // Save user data to localStorage immediately (before any async operations)
+                localStorage.setItem('store_user', JSON.stringify(currentUser));
+                console.log('✅ User data saved to localStorage:', currentUser.email);
                 
                 // Check if user is blacklisted
                 const isBlacklisted = await checkBlacklist(user.email);
@@ -2395,6 +2426,9 @@
                     showBannedModal();
                     return;
                 }
+                
+                // Save user data to MongoDB
+                saveUserData();
                 
                 // Load balance from server first, then fallback to localStorage
                 try {
@@ -2444,8 +2478,9 @@
                     }
                 }, 500);
                 
-                // Show user menu
+                // Show user menu immediately
                 showUserMenu();
+                console.log('✅ User menu displayed for:', currentUser.email);
                 
                 // Force refresh admin panel visibility after login
                 setTimeout(() => {
@@ -2465,6 +2500,11 @@
                         } else {
                             adminBtn.style.display = 'none';
                         }
+                    }
+                    
+                    // Double-check user menu is still visible
+                    if (currentUser) {
+                        showUserMenu();
                     }
                 }, 200);
                 
@@ -2803,12 +2843,18 @@
                     </div>
                     <div class="marketplace-item-info">
                         <h3>${item.name}</h3>
-                        <p>${item.description || ''}</p>
+                        <p>${item.description || 'Không có mô tả'}</p>
                         <div class="marketplace-item-footer">
-                            <div class="marketplace-item-price">${formatCurrency(item.price)}</div>
-                            <div class="marketplace-item-quantity">Số lượng: ${item.quantity}</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div class="marketplace-item-price">${formatCurrency(item.price)}</div>
+                                    <div class="marketplace-item-quantity">
+                                        <i class="fas fa-box"></i> Còn lại: ${item.quantity - (item.sold || 0)}
+                                    </div>
+                                </div>
+                            </div>
                             <button class="marketplace-buy-btn" onclick="buyMarketplaceItem('${item._id}')">
-                                <i class="fas fa-shopping-cart"></i> Mua
+                                <i class="fas fa-shopping-cart"></i> Mua Ngay
                             </button>
                         </div>
                     </div>
