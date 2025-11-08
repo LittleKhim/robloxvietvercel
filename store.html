@@ -3852,7 +3852,35 @@
                     })
                 });
                 
-                const data = await response.json();
+                // Parse response - handle both JSON and text errors
+                let data;
+                const contentType = response.headers.get('content-type');
+                const isJson = contentType && contentType.includes('application/json');
+                
+                try {
+                    if (isJson) {
+                        data = await response.json();
+                    } else {
+                        // If not JSON, read as text
+                        const text = await response.text();
+                        console.error('Server returned non-JSON response:', text);
+                        throw new Error(`Server error: ${text.substring(0, 200)}`);
+                    }
+                } catch (parseError) {
+                    // If JSON parsing fails and we haven't read the body yet
+                    if (!isJson || parseError.message.includes('Server error:')) {
+                        throw parseError;
+                    }
+                    // Try to get text if JSON parse failed
+                    try {
+                        // Clone response to read again (if possible)
+                        const text = await response.clone().text();
+                        console.error('Failed to parse JSON response:', text);
+                        throw new Error(`Server error: ${text.substring(0, 200)}`);
+                    } catch (textError) {
+                        throw new Error(`Failed to parse server response: ${parseError.message}`);
+                    }
+                }
                 
                 if (response.ok) {
                     // Update balance if fee was deducted
@@ -3890,15 +3918,18 @@
                         browseTab.click();
                     }
                 } else {
-                    if (data.insufficientBalance) {
-                        showNotification('Lỗi', data.error || 'Số dư không đủ!', 'error');
+                    // Handle error response
+                    const errorMessage = data?.error || data?.details || 'Không thể đăng bán sản phẩm';
+                    if (data?.insufficientBalance) {
+                        showNotification('Lỗi', errorMessage || 'Số dư không đủ!', 'error');
                     } else {
-                        throw new Error(data.error || 'Failed to submit item');
+                        showNotification('Lỗi', errorMessage, 'error');
                     }
                 }
             } catch (error) {
                 console.error('Error submitting marketplace item:', error);
-                showNotification('Lỗi', 'Không thể đăng bán sản phẩm. Vui lòng thử lại!', 'error');
+                const errorMessage = error.message || 'Không thể đăng bán sản phẩm. Vui lòng thử lại!';
+                showNotification('Lỗi', errorMessage, 'error');
             }
         }
         

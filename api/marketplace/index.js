@@ -135,8 +135,30 @@ export default async function handler(req, res) {
             
             const { sellerEmail, name, description, image, price, quantity, category, phone, facebookLink } = req.body;
             
+            // Validate required fields
             if (!sellerEmail || !name || !price || !quantity) {
-                return res.status(400).json({ error: 'Missing required fields' });
+                return res.status(400).json({ 
+                    error: 'Missing required fields',
+                    missing: {
+                        sellerEmail: !sellerEmail,
+                        name: !name,
+                        price: !price,
+                        quantity: !quantity
+                    }
+                });
+            }
+            
+            // Validate category
+            if (category && !['robux', 'item', 'other'].includes(category)) {
+                return res.status(400).json({ error: 'Invalid category. Must be: robux, item, or other' });
+            }
+            
+            // Validate price and quantity
+            if (isNaN(price) || price <= 0) {
+                return res.status(400).json({ error: 'Price must be a positive number' });
+            }
+            if (isNaN(quantity) || quantity <= 0) {
+                return res.status(400).json({ error: 'Quantity must be a positive number' });
             }
             
             // Check user balance and deduct posting fee (2,000₫)
@@ -219,7 +241,14 @@ export default async function handler(req, res) {
             });
         } catch (error) {
             console.error('Error creating marketplace item:', error);
-            res.status(500).json({ error: 'Failed to create marketplace item', details: error.message });
+            // Ensure we always return JSON, even on error
+            if (!res.headersSent) {
+                res.status(500).json({ 
+                    error: 'Failed to create marketplace item', 
+                    details: error.message,
+                    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+                });
+            }
         }
         // Don't close client in serverless - connection pooling handles it automatically
     } else if (req.method === 'PUT') {
