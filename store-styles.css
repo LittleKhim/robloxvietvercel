@@ -3266,6 +3266,27 @@ main {
     flex-direction: column;
 }
 
+.marketplace-item-card.expired {
+    opacity: 0.7;
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+.marketplace-item-card.expired::after {
+    content: 'Hết hạn';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    background: rgba(244, 67, 54, 0.9);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
 .marketplace-item-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 30px rgba(76, 175, 80, 0.2);
@@ -3454,6 +3475,217 @@ main {
     
     .marketplace-modal-content {
         padding: 1.5rem;
+    }
+}
+
+/* Product Detail Modal */
+.product-detail-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease;
+}
+
+.product-detail-modal-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(76, 175, 80, 0.3);
+    overflow: hidden;
+    animation: slideUp 0.4s ease;
+}
+
+.product-detail-modal-header {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.product-detail-modal-header h2 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.product-detail-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.product-detail-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.product-detail-modal-content {
+    padding: 2rem;
+    overflow-y: auto;
+    max-height: calc(90vh - 150px);
+}
+
+.product-detail-image {
+    width: 100%;
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.product-detail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-detail-info h2 {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+}
+
+.product-detail-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.product-detail-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: rgba(76, 175, 80, 0.05);
+    border-radius: 1rem;
+    border-left: 4px solid var(--accent-color);
+}
+
+.product-detail-section h3 {
+    margin: 0 0 1rem 0;
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.product-detail-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.info-label {
+    display: block;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    display: block;
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.contact-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.contact-btn {
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.phone-btn {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+}
+
+.phone-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.facebook-btn {
+    background: linear-gradient(135deg, #1877f2 0%, #1565c0 100%);
+}
+
+.facebook-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(24, 119, 242, 0.4);
+}
+
+.zalo-btn {
+    background: linear-gradient(135deg, #0068ff 0%, #0052cc 100%);
+}
+
+.zalo-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 104, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+    .product-detail-modal-container {
+        margin: 1rem;
+        border-radius: 1.5rem;
+    }
+    
+    .product-detail-modal-header {
+        padding: 1.5rem;
+    }
+    
+    .product-detail-modal-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .product-detail-modal-content {
+        padding: 1.5rem;
+    }
+    
+    .contact-buttons {
+        gap: 0.75rem;
+    }
+    
+    .contact-btn {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.9rem;
     }
     
     .marketplace-tabs {

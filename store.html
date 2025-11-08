@@ -650,6 +650,15 @@
                                 <label>Link Facebook (tùy chọn):</label>
                                 <input type="url" id="sell-item-facebook" placeholder="https://facebook.com/yourprofile">
                             </div>
+                            <div class="input-group">
+                                <label>Link Zalo (tùy chọn):</label>
+                                <input type="url" id="sell-item-zalo" placeholder="https://zalo.me/yourprofile hoặc số điện thoại Zalo">
+                            </div>
+                            <div style="padding: 1rem; background: rgba(255, 193, 7, 0.1); border-radius: 0.5rem; margin-top: 0.5rem;">
+                                <p style="margin: 0; color: #f57c00; font-weight: 600;">
+                                    <i class="fas fa-info-circle"></i> Phí đăng sản phẩm: <strong>2,000₫</strong>
+                                </p>
+                            </div>
                             <button class="marketplace-sell-btn" onclick="submitMarketplaceItem()">
                                 <i class="fas fa-upload"></i> Đăng Bán
                             </button>
@@ -665,6 +674,19 @@
                             <!-- Pagination will be rendered here -->
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail Modal -->
+        <div class="product-detail-modal-overlay" id="product-detail-modal" style="display: none;">
+            <div class="product-detail-modal-container">
+                <div class="product-detail-modal-header">
+                    <h2><i class="fas fa-info-circle"></i> Chi Tiết Sản Phẩm</h2>
+                    <button class="product-detail-modal-close" id="product-detail-modal-close">&times;</button>
+                </div>
+                <div class="product-detail-modal-content" id="product-detail-content">
+                    <!-- Product details will be loaded here -->
                 </div>
             </div>
         </div>
@@ -1107,6 +1129,13 @@
             });
         }
 
+        function updateBalanceDisplay() {
+            const balanceEl = document.getElementById('user-balance');
+            if (balanceEl) {
+                balanceEl.textContent = formatCurrency(userBalance);
+            }
+        }
+        
         function formatCurrency(amount) {
             if (currentLanguage === 'en') {
                 return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount / exchangeRate);
@@ -1905,7 +1934,7 @@
                 // Update local balance
                 userBalance = newBalance;
                 saveUserData();
-                document.getElementById('user-balance').textContent = formatCurrency(userBalance);
+                updateBalanceDisplay();
                 
                 // Save order to allOrders for admin management
                 const orderData = {
@@ -2219,10 +2248,7 @@
                 userNameEl.textContent = currentUser.name || currentUser.email;
                 console.log('✅ User name displayed:', currentUser.name || currentUser.email);
             }
-            if (userBalanceEl) {
-                userBalanceEl.textContent = formatCurrency(userBalance);
-                console.log('✅ User balance displayed:', userBalance);
-            }
+            updateBalanceDisplay();
             
             // Show admin button if user is admin
             if (adminBtn) {
@@ -3329,32 +3355,39 @@
                 return;
             }
             
-            grid.innerHTML = items.map(item => `
-                <div class="marketplace-item-card">
-                    <div class="marketplace-item-image">
+            grid.innerHTML = items.map(item => {
+                // Calculate time remaining
+                const timeRemaining = item.timeRemaining || 0;
+                const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const timeDisplay = timeRemaining > 0 ? `${hours}h ${minutes}m` : 'Hết hạn';
+                const isExpired = timeRemaining <= 0;
+                
+                return `
+                <div class="marketplace-item-card ${isExpired ? 'expired' : ''}" onclick="openProductDetail('${item._id}')" style="cursor: pointer;">
+                    <div class="marketplace-item-image" style="position: relative;">
                         <img src="${item.image || 'https://via.placeholder.com/200'}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/200'">
+                        ${item.uid ? `<div style="position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.7); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.7rem; font-weight: 600;">${item.uid}</div>` : ''}
                     </div>
                     <div class="marketplace-item-info">
                         <h3>${item.name}</h3>
                         <p>${item.description || 'Không có mô tả'}</p>
-                        ${item.phone ? `<p style="font-size: 0.85rem; color: #666; margin: 0.25rem 0;"><i class="fas fa-phone"></i> ${item.phone}</p>` : ''}
-                        ${item.facebookLink ? `<p style="font-size: 0.85rem; color: #666; margin: 0.25rem 0;"><i class="fab fa-facebook"></i> <a href="${item.facebookLink}" target="_blank" style="color: #1877f2;">Liên hệ Facebook</a></p>` : ''}
-                        <div class="marketplace-item-footer">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div class="marketplace-item-price">${formatCurrency(item.price)}</div>
-                                    <div class="marketplace-item-quantity">
-                                        <i class="fas fa-box"></i> Còn lại: ${item.quantity - (item.sold || 0)}
-                                    </div>
-                                </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.5rem 0;">
+                            <div class="marketplace-item-price">${formatCurrency(item.price)}</div>
+                            <div style="font-size: 0.85rem; color: ${isExpired ? '#f44336' : '#666'}; font-weight: 600;">
+                                <i class="fas fa-clock"></i> ${timeDisplay}
                             </div>
-                            <button class="marketplace-buy-btn" onclick="buyMarketplaceItem('${item._id}')">
-                                <i class="fas fa-shopping-cart"></i> Mua Ngay
-                            </button>
                         </div>
+                        <div class="marketplace-item-quantity" style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-box"></i> Còn lại: ${item.quantity - (item.sold || 0)}
+                        </div>
+                        <button class="marketplace-buy-btn" onclick="event.stopPropagation(); openProductDetail('${item._id}')" style="width: 100%;">
+                            <i class="fas fa-info-circle"></i> Xem Chi Tiết
+                        </button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
         
         // Handle image upload preview
@@ -3441,6 +3474,7 @@
             const quantity = parseInt(document.getElementById('sell-item-quantity').value);
             const phone = document.getElementById('sell-item-phone').value.trim();
             const facebookLink = document.getElementById('sell-item-facebook').value.trim();
+            const zaloLink = document.getElementById('sell-item-zalo').value.trim();
             
             if (!name || !price || price < 1000 || !quantity || quantity < 1) {
                 showNotification('Lỗi', 'Vui lòng điền đầy đủ thông tin hợp lệ!', 'error');
@@ -3459,14 +3493,23 @@
                         price: price,
                         quantity: quantity,
                         phone: phone,
-                        facebookLink: facebookLink
+                        facebookLink: facebookLink,
+                        zaloLink: zaloLink
                     })
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    showNotification('Thành công', data.message || 'Đã đăng bán sản phẩm!', 'success');
+                    // Update balance if fee was deducted
+                    if (data.feeDeducted) {
+                        userBalance = data.newBalance || (userBalance - data.feeDeducted);
+                        localStorage.setItem('store_balance', userBalance.toString());
+                        updateBalanceDisplay();
+                        showNotification('Thành công', `${data.message || 'Đã đăng bán sản phẩm!'} Đã trừ phí ${formatCurrency(data.feeDeducted)}. Số dư còn lại: ${formatCurrency(data.newBalance)}`, 'success');
+                    } else {
+                        showNotification('Thành công', data.message || 'Đã đăng bán sản phẩm!', 'success');
+                    }
                     // Clear form
                     document.getElementById('sell-item-name').value = '';
                     document.getElementById('sell-item-description').value = '';
@@ -3476,16 +3519,157 @@
                     document.getElementById('sell-item-quantity').value = '1';
                     document.getElementById('sell-item-phone').value = '';
                     document.getElementById('sell-item-facebook').value = '';
+                    document.getElementById('sell-item-zalo').value = '';
                     document.getElementById('sell-item-image-preview').style.display = 'none';
                     // Reload items
                     loadMarketplaceItems(1);
                 } else {
-                    throw new Error(data.error || 'Failed to submit item');
+                    if (data.insufficientBalance) {
+                        showNotification('Lỗi', data.error || 'Số dư không đủ!', 'error');
+                    } else {
+                        throw new Error(data.error || 'Failed to submit item');
+                    }
                 }
             } catch (error) {
                 console.error('Error submitting marketplace item:', error);
                 showNotification('Lỗi', 'Không thể đăng bán sản phẩm. Vui lòng thử lại!', 'error');
             }
+        }
+        
+        let currentProductDetail = null;
+        
+        async function openProductDetail(itemId) {
+            try {
+                // Fetch all items to find the one we need
+                const response = await fetch(`${API_BASE_URL}/marketplace?page=1&limit=1000`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const item = data.items.find(i => {
+                        const idStr = i._id ? i._id.toString() : '';
+                        return idStr === itemId || i._id === itemId;
+                    });
+                    
+                    if (!item) {
+                        showNotification('Lỗi', 'Không tìm thấy sản phẩm!', 'error');
+                        return;
+                    }
+                    
+                    currentProductDetail = item;
+                    renderProductDetail(item);
+                    document.getElementById('product-detail-modal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    throw new Error('Failed to fetch items');
+                }
+            } catch (error) {
+                console.error('Error loading product detail:', error);
+                showNotification('Lỗi', 'Không thể tải thông tin sản phẩm!', 'error');
+            }
+        }
+        
+        function closeProductDetail() {
+            document.getElementById('product-detail-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            currentProductDetail = null;
+        }
+        
+        function renderProductDetail(item) {
+            const isSeller = currentUser && currentUser.email === item.sellerEmail;
+            const timeRemaining = item.timeRemaining || 0;
+            const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+            const isExpired = timeRemaining <= 0;
+            
+            const content = document.getElementById('product-detail-content');
+            content.innerHTML = `
+                <div class="product-detail-image">
+                    <img src="${item.image || 'https://via.placeholder.com/400'}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/400'">
+                </div>
+                <div class="product-detail-info">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h2>${item.name}</h2>
+                            ${item.uid ? `<p style="color: #666; font-size: 0.9rem; margin: 0.25rem 0;"><strong>Mã SP:</strong> ${item.uid}</p>` : ''}
+                        </div>
+                        <div class="product-detail-price">${formatCurrency(item.price)}</div>
+                    </div>
+                    
+                    <div class="product-detail-section">
+                        <h3><i class="fas fa-align-left"></i> Mô tả</h3>
+                        <p>${item.description || 'Không có mô tả'}</p>
+                    </div>
+                    
+                    <div class="product-detail-section">
+                        <h3><i class="fas fa-info-circle"></i> Thông tin</h3>
+                        <div class="product-detail-info-grid">
+                            <div>
+                                <span class="info-label">Số lượng còn lại:</span>
+                                <span class="info-value">${item.quantity - (item.sold || 0)}</span>
+                            </div>
+                            <div>
+                                <span class="info-label">Thời gian còn lại:</span>
+                                <span class="info-value" id="product-time-remaining" style="color: ${isExpired ? '#f44336' : '#4caf50'}; font-weight: 600;">
+                                    ${isExpired ? 'Hết hạn' : `${hours}h ${minutes}m ${seconds}s`}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${!isSeller ? `
+                    <div class="product-detail-section">
+                        <h3><i class="fas fa-phone-alt"></i> Thông tin liên hệ</h3>
+                        <div class="contact-buttons">
+                            ${item.phone ? `
+                            <a href="tel:${item.phone}" class="contact-btn phone-btn">
+                                <i class="fas fa-phone"></i> Gọi: ${item.phone}
+                            </a>
+                            ` : ''}
+                            ${item.facebookLink ? `
+                            <a href="${item.facebookLink}" target="_blank" class="contact-btn facebook-btn">
+                                <i class="fab fa-facebook"></i> Facebook
+                            </a>
+                            ` : ''}
+                            ${item.zaloLink ? `
+                            <a href="${item.zaloLink.startsWith('http') ? item.zaloLink : 'https://zalo.me/' + item.zaloLink.replace(/[^0-9]/g, '')}" target="_blank" class="contact-btn zalo-btn">
+                                <i class="fab fa-zalo"></i> Zalo
+                            </a>
+                            ` : ''}
+                        </div>
+                        ${!item.phone && !item.facebookLink && !item.zaloLink ? '<p style="color: #999; font-style: italic;">Người bán chưa cung cấp thông tin liên hệ</p>' : ''}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Start countdown timer if not expired
+            if (!isExpired && timeRemaining > 0) {
+                startProductCountdown(item._id, timeRemaining);
+            }
+        }
+        
+        function startProductCountdown(itemId, initialTime) {
+            let remaining = initialTime;
+            const timerElement = document.getElementById('product-time-remaining');
+            
+            if (!timerElement) return;
+            
+            const interval = setInterval(() => {
+                remaining -= 1000;
+                
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    timerElement.textContent = 'Hết hạn';
+                    timerElement.style.color = '#f44336';
+                    return;
+                }
+                
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                
+                timerElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
+            }, 1000);
         }
         
         async function buyMarketplaceItem(itemId) {
@@ -3494,8 +3678,8 @@
                 return;
             }
             
-            // Implementation for buying marketplace items
-            showNotification('Thông báo', 'Tính năng mua sản phẩm đang được phát triển', 'info');
+            // Open product detail instead
+            openProductDetail(itemId);
         }
         
         let currentMyItemsPage = 1;
@@ -4795,11 +4979,8 @@
                 userBalance = newBalance;
             saveUserData();
                 
-                // Update UI
-                const balanceEl = document.getElementById('user-balance');
-                if (balanceEl) {
-                    balanceEl.textContent = formatCurrency(userBalance);
-                }
+                    // Update UI
+                    updateBalanceDisplay();
                 
                 // Save transaction
                 await saveTransactionToServer({
@@ -5138,6 +5319,21 @@
                 marketplaceModal.addEventListener('click', function(e) {
                     if (e.target === this) {
                         closeMarketplace();
+                    }
+                });
+            }
+            
+            // Product detail modal event listeners
+            const productDetailModalClose = document.getElementById('product-detail-modal-close');
+            if (productDetailModalClose) {
+                productDetailModalClose.addEventListener('click', closeProductDetail);
+            }
+            
+            const productDetailModal = document.getElementById('product-detail-modal');
+            if (productDetailModal) {
+                productDetailModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeProductDetail();
                     }
                 });
             }
