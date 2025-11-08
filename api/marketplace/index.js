@@ -98,7 +98,7 @@ export default async function handler(req, res) {
             const db = client.db('store_db');
             const marketplaceCollection = db.collection('marketplace');
             
-            const { sellerEmail, name, description, image, price, quantity, category, phone, facebookLink, zaloLink } = req.body;
+            const { sellerEmail, name, description, image, price, quantity, category, phone, facebookLink } = req.body;
             
             if (!sellerEmail || !name || !price || !quantity) {
                 return res.status(400).json({ error: 'Missing required fields' });
@@ -151,7 +151,6 @@ export default async function handler(req, res) {
                 category: category || 'other', // Default category
                 phone: phone || '',
                 facebookLink: facebookLink || '',
-                zaloLink: zaloLink || '',
                 sold: 0,
                 verified: verified,
                 verifiedAt: verified ? new Date() : null,

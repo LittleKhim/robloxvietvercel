@@ -39,7 +39,7 @@ export default async function handler(req, res) {
                 // Get transaction to get amount
                 const transaction = await transactionsCollection.findOne({ id: id });
                 if (transaction && transaction.amount) {
-                    await usersCollection.updateOne(
+                    const updateResult = await usersCollection.updateOne(
                         { email: userEmail },
                         {
                             $inc: { balance: transaction.amount },
@@ -47,6 +47,10 @@ export default async function handler(req, res) {
                         },
                         { upsert: true }
                     );
+                    
+                    // Get updated balance to return
+                    const updatedUser = await usersCollection.findOne({ email: userEmail });
+                    console.log('Transaction completed - Updated balance:', updatedUser?.balance);
                 }
             }
             

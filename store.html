@@ -650,10 +650,6 @@
                                 <label>Link Facebook (tùy chọn):</label>
                                 <input type="url" id="sell-item-facebook" placeholder="https://facebook.com/yourprofile">
                             </div>
-                            <div class="input-group">
-                                <label>Link Zalo (tùy chọn):</label>
-                                <input type="url" id="sell-item-zalo" placeholder="https://zalo.me/yourprofile hoặc số điện thoại Zalo">
-                            </div>
                             <div style="padding: 1rem; background: rgba(255, 193, 7, 0.1); border-radius: 0.5rem; margin-top: 0.5rem;">
                                 <p style="margin: 0; color: #f57c00; font-weight: 600;">
                                     <i class="fas fa-info-circle"></i> Phí đăng sản phẩm: <strong>2,000₫</strong>
@@ -1658,7 +1654,10 @@
         
         // Update balance on server
         async function updateBalanceOnServer(newBalance) {
-            if (!currentUser || !currentUser.email) return;
+            if (!currentUser || !currentUser.email) {
+                console.warn('updateBalanceOnServer: No current user');
+                return;
+            }
             
             try {
                 const email = encodeURIComponent(currentUser.email);
@@ -1673,13 +1672,23 @@
                 });
                 
                 if (response.ok) {
-                    console.log('✅ Balance updated successfully on server');
+                    const data = await response.json();
+                    console.log('✅ Balance updated successfully on server:', data);
+                    // Update local balance to match server
+                    if (data.balance !== undefined) {
+                        userBalance = parseFloat(data.balance);
+                        localStorage.setItem('store_balance', userBalance.toString());
+                        updateBalanceDisplay();
+                    }
+                    return true;
                 } else {
                     const errorText = await response.text();
                     console.error('❌ Failed to update balance:', response.status, errorText);
+                    return false;
                 }
             } catch (error) {
                 console.error('Error updating balance on server:', error);
+                return false;
             }
         }
         
@@ -2932,10 +2941,25 @@
                     try {
                         const refreshedBalance = await getCurrentBalance();
                         console.log('Balance refreshed after delay:', refreshedBalance);
+                        // Ensure balance is saved to MongoDB
+                        if (refreshedBalance > 0) {
+                            await updateBalanceOnServer(refreshedBalance);
+                        }
                     } catch (error) {
                         console.error('Error refreshing balance:', error);
                     }
                 }, 500);
+                
+                // Additional sync after 2 seconds to ensure balance is saved
+                setTimeout(async () => {
+                    try {
+                        const finalBalance = await getCurrentBalance();
+                        await updateBalanceOnServer(finalBalance);
+                        console.log('Final balance sync completed:', finalBalance);
+                    } catch (error) {
+                        console.error('Error in final balance sync:', error);
+                    }
+                }, 2000);
                 
                 // Show user menu immediately and multiple times to ensure it's visible
                 showUserMenu();
@@ -3474,7 +3498,6 @@
             const quantity = parseInt(document.getElementById('sell-item-quantity').value);
             const phone = document.getElementById('sell-item-phone').value.trim();
             const facebookLink = document.getElementById('sell-item-facebook').value.trim();
-            const zaloLink = document.getElementById('sell-item-zalo').value.trim();
             
             if (!name || !price || price < 1000 || !quantity || quantity < 1) {
                 showNotification('Lỗi', 'Vui lòng điền đầy đủ thông tin hợp lệ!', 'error');
@@ -3494,7 +3517,6 @@
                         quantity: quantity,
                         phone: phone,
                         facebookLink: facebookLink,
-                        zaloLink: zaloLink
                     })
                 });
                 
@@ -3519,7 +3541,6 @@
                     document.getElementById('sell-item-quantity').value = '1';
                     document.getElementById('sell-item-phone').value = '';
                     document.getElementById('sell-item-facebook').value = '';
-                    document.getElementById('sell-item-zalo').value = '';
                     document.getElementById('sell-item-image-preview').style.display = 'none';
                     // Reload items
                     loadMarketplaceItems(1);
@@ -3630,13 +3651,8 @@
                                 <i class="fab fa-facebook"></i> Facebook
                             </a>
                             ` : ''}
-                            ${item.zaloLink ? `
-                            <a href="${item.zaloLink.startsWith('http') ? item.zaloLink : 'https://zalo.me/' + item.zaloLink.replace(/[^0-9]/g, '')}" target="_blank" class="contact-btn zalo-btn">
-                                <i class="fab fa-zalo"></i> Zalo
-                            </a>
-                            ` : ''}
                         </div>
-                        ${!item.phone && !item.facebookLink && !item.zaloLink ? '<p style="color: #999; font-style: italic;">Người bán chưa cung cấp thông tin liên hệ</p>' : ''}
+                        ${!item.phone && !item.facebookLink ? '<p style="color: #999; font-style: italic;">Người bán chưa cung cấp thông tin liên hệ</p>' : ''}
                     </div>
                     ` : ''}
                 </div>
