@@ -2031,6 +2031,37 @@
             }
         }
         
+        // Log login session for tracking
+        async function logLoginSession(sessionData) {
+            try {
+                // Get client IP (if available)
+                let ip = 'Unknown';
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    if (ipResponse.ok) {
+                        const ipData = await ipResponse.json();
+                        ip = ipData.ip;
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch IP:', e);
+                }
+                
+                await fetch(`${API_BASE_URL}/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...sessionData,
+                        ip: ip,
+                        userAgent: navigator.userAgent || 'Unknown',
+                        url: window.location.href,
+                        referrer: document.referrer || 'Direct'
+                    })
+                });
+            } catch (error) {
+                console.error('Failed to log session:', error);
+            }
+        }
+        
         function showUserMenu() {
             if (!currentUser) {
                 console.warn('showUserMenu called but currentUser is null');
@@ -2056,11 +2087,13 @@
             const adminBtn = document.getElementById('admin-panel-btn');
             
             if (userMenuContainer) {
-                userMenuContainer.style.display = 'block';
+                userMenuContainer.style.display = 'flex'; // Use flex instead of block for better mobile layout
+                userMenuContainer.style.visibility = 'visible';
                 console.log('✅ User menu container displayed');
             }
             if (signinContainer) {
                 signinContainer.style.display = 'none';
+                signinContainer.style.visibility = 'hidden';
                 console.log('✅ Login button hidden');
             }
             
@@ -2096,12 +2129,16 @@
             const userMenuContainer = document.getElementById('user-menu-container');
             const signinContainer = document.getElementById('google-signin-container');
             
-            if (userMenuContainer) userMenuContainer.style.display = 'none';
+            if (userMenuContainer) {
+                userMenuContainer.style.display = 'none';
+                userMenuContainer.style.visibility = 'hidden';
+            }
             if (signinContainer) {
                 signinContainer.style.display = 'flex'; // Use flex to match CSS
+                signinContainer.style.visibility = 'visible';
                 // Ensure button is rendered (only if not already rendered)
                 if (!buttonsRendered) {
-            initializeGoogleSignIn();
+                    initializeGoogleSignIn();
                 }
             }
         }
@@ -2475,6 +2512,14 @@
                 localStorage.setItem('store_user', JSON.stringify(currentUser));
                 console.log('✅ User data saved to localStorage:', currentUser.email);
                 
+                // Log successful login session
+                logLoginSession({
+                    email: user.email,
+                    status: 'success',
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
+                }).catch(e => console.error('Error logging session:', e));
+                
                 // Check if user is blacklisted
                 const isBlacklisted = await checkBlacklist(user.email);
                 if (isBlacklisted) {
@@ -2631,6 +2676,15 @@
                 
             } catch (error) {
                 console.error('Error checking user session:', error);
+                
+                // Log failed login attempt
+                logLoginSession({
+                    email: 'unknown',
+                    status: 'failed',
+                    error: error.message || error.toString(),
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
+                }).catch(e => console.error('Error logging failed session:', e));
                 
                 // If this is after OAuth redirect and first attempt failed, retry more times
                 const urlParams = new URLSearchParams(window.location.search);
